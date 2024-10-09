@@ -1,0 +1,88 @@
+---
+title: "Asignación taxonómica"
+---
+
+### GTDB-tk
+
+GTDB-Tk es una herramienta que asigna taxonomía a genomas utilizando la base de datos [GTDB](https://gtdb.ecogenomic.org/) (Genome Taxonomy Database). Basado en árboles filogenéticos y medidas de ANI (Average Nucleotide Identity), GTDB-Tk clasifica genomas bacterianos y arqueanos, proporciona una taxonomía coherente y actualizada. Se utiliza mucho en el análisis de genomas y metagenomas.
+
+![GTDB-tk Workflow](Figures/GTDB-tk_worflow.png){fig-align="center" width="944"}
+
+Recordemos que ya tenemos un set de *bins* refinados y desreplicados. Ahora vamos a asignarles identidad taxonómica, para ello vamos a correr GTDB-tk
+
+::: callout-important
+## Activa el ambiente de gtdbtk
+
+``` bash
+conda activate gtdbtk-2.1.1
+```
+:::
+
+El directorio de resultados para gtdbtk ya lo tienes en tu carpeta de resultados. Para colocar los *bins* refinados y renombrados ejecuta el script \`src/copiar_renombrarbins.sh\` :
+
+``` bash
+ bash src/copiar_renombrarbins.sh
+```
+
+Ahora si, vamos a correr gtdbtk
+
+``` bash
+pip install numpy==1.19.5
+
+gtdbtk classify_wf --genome_dir results/10.gtdbtk/bins/ --out_dir results/10.gtdbtk/ --cpus 4 -x fasta
+```
+
+No olvides desactivar el ambiente
+
+``` bash
+conda deactivate
+```
+
+::: callout-caution
+## Resultado de GTDB-Tk
+
+Si gtdbtk está tomando mucho tiempo puedes parar el proceso con `ctrl + C` en tu teclado. El resultado final se encuentra en el directorio y archivo: `results/10.gtdbtk/gtdbtk.bac120.summary.tsv` que se copió desde el inicio.
+:::
+
+Después de ejecutar GTDB-tk, continuaremos en R para visualizar los datos.
+
+``` r
+library(tidyverse)
+library(ggplot2)
+# Leer la tabla ------------------------------------------------------------####
+GTDBtk <- read.table("gtdbtk.bac120.summary.tsv", 
+                    sep = "\t", header = TRUE, na.strings = "", 
+                    stringsAsFactors = FALSE) %>%
+  as_tibble()
+
+# Transformar datos --------------------------------------------------------####
+
+pozol_gtdbtk <- GTDBtk %>%
+  select(user_genome, classification) %>%
+  separate(classification, c(
+    "Domain", "Phylum", "Class", "Order", "Family", "Genus", "Species"), 
+    sep = ";") %>%
+  rename(Bin_name = user_genome) %>%
+  unite(Bin_name_2, c("Bin_name", "Phylum"), remove = FALSE) %>%
+  select(Bin_name, Domain, Phylum, Class, Order, Family, Genus, Species)
+
+# Guardamos los datos en un archivo de metadatos ---------------------------####
+write.table(pozol_gtdbtk, file = "Metadatos.txt", 
+            sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
+
+# Visualización de Datos ---------------------------------------------------####
+GTDBtk_barplot <- pozol_gtdbtk %>%
+  count(Phylum, Genus) %>%
+  rename(Number_of_MAGs = n) %>%
+  ggplot(aes(x = Phylum, y = Number_of_MAGs, fill = Genus)) + 
+  geom_bar(stat = "identity", position = position_dodge()) +
+  theme_minimal()
+
+GTDBtk_barplot
+```
+
+::: callout-important
+## Discusión
+
+En equipos revisen los resultados generados por GTDB-tk y propongan un plan para mejorar la identificación taxonómica, qué harían para darle más soporte a estos resultados?
+:::
