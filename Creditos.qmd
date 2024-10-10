@@ -8,11 +8,11 @@ title: "Créditos"
 
 -   Todos los miembros del laboratorio [LandaLab](https://github.com/landalab0) del [Departamento](https://www.icmyl.unam.mx/es/quienes_somos/personal_academico/vazquez-rosas-landa-mirna) de Ecología Molecular y genómica poblacional del ICMyL de la UNAM, por la sugerencias a la mejora de este tutorial.
 
--   Al M. en C. [Rafael López Sánchez](https://www.ibt.unam.mx/perfil/3986/mc-rafael-lopez-sanchez), por donar los datos de metagenómica del pozol libres de maíz y por revisar el material del taller.
+-   Al M. en C. [Rafael López Sánchez](https://www.ibt.unam.mx/perfil/3986/mc-rafael-lopez-sanchez), por donar los datos de metagenómica del pozol libres de maíz.
 
--   A la [Dra. Nelly Selém](https://matmor.unam.mx/es/personal/investigadores/nselem) por brindar apoyo y acceso al servidor de trabajo.
+-   Al [Dr. Enrique Ibarra-Laclette](http://perfiles.inecol.mx/index.php/home/moleculares/enrique-ibarra-laclette) por la organización del curso y brindar apoyo y acceso al servidor de trabajo.
 
--   Al M. en C. [Luis Gerardo Tejero Gómez](https://www.matmor.unam.mx/es/personal/tecnico) de la unidad de computo del Centro de Ciencias Matemática de la UNAM. Por su invaluable apoyo en la instalación y soporte de las herramientas usadas en este taller.
+-   Al [M. en C. Emanuel Villafán de la Torre](http://perfiles.inecol.mx/index.php/home/moleculares/emanuel-villafan-de-la-torre) de la Red de Estudios Moleculares Avanzados del INECOL por la instalación y soporte de las herramientas usadas en este taller.
 
 ------------------------------------------------------------------------
 
@@ -20,4 +20,4 @@ El material de esta práctica inicialmente se preparó para los Talleres Interna
 
 El material se ha ido modificando con el tiempo y sigue en desarrollo. Si tienes sugerencias para agregar y/o modificar este material puedes escribirlas [aquí](https://docs.google.com/document/d/1lwMaJJh9gVbPaQs9mPxSftDhqaFpEqyyZVowtT6Afbg/edit?usp=sharing)
 
-**Contacto**: hoaxacadiana\@gmail.com
+**Contacto**: hoaxacadiana\@gmail.com y mvazquez\@cmarl.unam.mx

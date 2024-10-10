@@ -209,7 +209,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Típicamente los metagenomas pueden estudiarse mediante dos aproximaciones:</p>
 <ol type="1">
 <li>La clasificación taxonómica de contigs o lecturas y la inferencia metabólica de los contigs.</li>
-<li>La reconstrucción de genomas a partir de metagenomas (MAGs), clasificación taxonómica y la inferencia metabólica de los MAGs.</li>
+<li>La reconstrucción de genomas a partir de metagenomas (<a href="https://merenlab.org/momics/">MAGs</a>), clasificación taxonómica y la inferencia metabólica de los MAGs.</li>
 </ol>
 <p>En este apartado nos enfocaremos en la segunda aproximación. Los MAGs se reconstruyen a partir de un ensamble metagenómico, los contigs de dicho ensamble se agrupan mediante la información de cobertura y frecuencia de tetranucleótidos. Esta agrupación puede generar errores, por lo que es indispensable evaluar la calidad de los MAGs mediante la completitud y redundancia de genes de copia única (<a href="https://anvio.org/vocabulary/">MerenLab y col.</a>)</p>
 <p>Para obtener MAGs podemos seguir el siguiente flujo de análisis:</p>
@@ -394,7 +394,7 @@ Desactiva el ambiente
 </div>
 </section>
 <section id="maxbin2" class="level3 page-columns page-full">
-<h3 class="anchored" data-anchor-id="maxbin2">MaxBin2</h3>
+<h3 class="anchored">MaxBin2</h3>
 <p><a href="https://sourceforge.net/projects/maxbin/files/">MaxBin2</a> agrupa los contigs de acuerdo a la información de cobertura, composición nucleotídica y genes <strong>de marcadores de copia única</strong>.</p>
 <p>Vamos a ejecutarlo, activemos el <a href="#0">ambiente conda</a> donde se encuentra maxbin.</p>
 <div class="callout callout-style-default callout-caution callout-titled">
@@ -436,18 +436,17 @@ Activar ambiente para MaxBin2
 <span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="ex">run_MaxBin.pl</span> <span class="at">-thread</span> 6 <span class="at">-min_contig_length</span> 1500 <span class="at">-contig</span> results/02.ensambles/48hrs.fasta <span class="at">-out</span> results/05.maxbin/48hrs_maxbin <span class="at">-abund</span> results/03.profundidad/48hrs.mgh_depth.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Y lo ejecutamos:</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">sbatch</span> src/05.maxbin.slurm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="callout callout-style-default callout-important callout-titled" title="Ejercicio:">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout callout-style-default callout-important callout-titled" title="Responde:">
+<div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Ejercicio:
+Responde:
 </div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-11" class="callout-11-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
+<section id="responde" class="level2 callout-body-container callout-body">
+<h2 class="anchored" data-anchor-id="responde">Responde</h2>
 <p>1. ¿Cuántos bins se formaron?</p>
 <p>2. ¿Qué porcentaje de completitud tienen??</p>
 <div class="callout callout-style-default callout-tip callout-titled" title="Solución">
@@ -469,8 +468,7 @@ Solución
 </div>
 </div>
 </div>
-</div>
-</div>
+</section>
 </div>
 <div class="callout callout-style-default callout-caution callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -500,14 +498,23 @@ Activa el ambiente binning
 </div>
 <div class="callout-body-container callout-body">
 <ul>
-<li><div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> activate binning</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> activate mt-vamb</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 </ul>
 </div>
 </div>
-<p>Vamos a correr vamb, pero primero crea el directorio de resultados</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> results/06.vamb</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Ejecutemos vamb:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">vamb</span> <span class="at">--fasta</span> results/02.ensambles/48hrs.fasta <span class="at">--jgi</span> results/03.profundidad/48hrs.mgh_depth.txt <span class="at">--minfasta</span> 500000 <span class="at">--outdir</span> results/06.vamb/48hrs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Crea el script para vamb:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATHC -J Vamb </span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH -t 0</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH -e outs/06.vamb.err</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH -o outs/06.vamb.out</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --export=ALL</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co">#Crea el directorio para los resultados de vamb</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> results/06.vamb</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="co"># La linea para vamb</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="ex">vamb</span> <span class="at">--fasta</span> results/02.ensambles/48hrs.fasta <span class="at">--bamfiles</span> results/03.profundidad/48hrs_sorted.bam <span class="at">--minfasta</span> 500000 <span class="at">--outdir</span> results/06.vamb/48hrs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -518,7 +525,7 @@ Important
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Si quisieras recuperar los genomas de virus ¿Qué parámetro cambiarías?</p>
+<p>Si quisieras recuperar los genomas de virus ¿Qué cambiarías?</p>
 </div>
 </div>
 <div class="callout callout-style-default callout-tip callout-titled">
@@ -532,6 +539,19 @@ Otros programas para binning
 </div>
 <div class="callout-body-container callout-body">
 <p>Recientemente se publicó COMEBin, que utiliza un enfoque distinto a lo que hemos usado en este tutorial. En el siguiente <a href="https://github.com/ziyewang/COMEBin">link</a> encontrarás el manual y una explicación general sobre su funcionamiento.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+No olvides descatvar el ambiente
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> deactivate</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </section>
@@ -548,7 +568,7 @@ Otros programas para binning
 <p>Para disminuir la contaminación e incrementar la completitud hay algunos programas que pueden ayudarnos. Entre ellos están Binning_refiner y DASTool.</p>
 <section id="checkm" class="level3 page-columns page-full">
 <h3 class="anchored" data-anchor-id="checkm">CheckM</h3>
-<p>Antes de proceder al refinamiento es necesario tener claro cómo se evalúa la completitud y contaminación de los <em>bins.</em> Para esta evaluación se usa <a href="https://github.com/Ecogenomics/CheckM/wiki/Workflows#lineage-specific-workflow">CheckM</a> que se ha convertido en una herramienta estándar para la evaluación de la calidad de genomas y MAGs, y es usada por la mayoría de programas de refinamiento.</p>
+<p>Antes de proceder al refinamiento es necesario tener claro cómo se evalúa la completitud y contaminación de los <em>bins.</em> Para esta evaluación se usa <a href="https://github.com/Ecogenomics/CheckM/wiki/Workflows#lineage-specific-workflow">CheckM</a> que se ha convertido en una herramienta estándar para la evaluación de la <a href="https://genome.cshlp.org/content/25/7/1043/T3.expansion.html">calidad de genomas</a> y MAGs, y es usada por la mayoría de programas de refinamiento.</p>
 <p>Para hacer esta evaluación, CheckM utiliza una serie de herramientas: <code>tree</code> organiza los genomas en un árbol de referencia. <code>tree_qa</code> evalúa la cantidad de genes marcadores filogenéticos y su ubicación en el árbol. El comando <code>lineage_set</code> crea un archivo de marcadores específicos de linaje, que se usa en el comando <code>analyze</code> para evaluar la integridad y contaminación de los genomas. Finalmente, el comando <code>qa</code> genera tablas que resumen la calidad de los genomas.</p>
 <div class="quarto-figure quarto-figure-center page-columns page-full">
 <figure class="figure page-columns page-full">
@@ -556,17 +576,30 @@ Otros programas para binning
 <figcaption class="figure-caption margin-caption">CheckM Workflow</figcaption>
 </figure>
 </div>
-<p>En este taller no vamos a correr CheckM porque los programas de refinamiento que usaremos ya lo corren de forma interna, sin embargo, es útil correrlo para tener una idea clara sobre la calidad de los bins que obtengamos.</p>
-<p>Te dejamos la siguiente línea para que la uses en tus proyectos.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">#ejemplo de como correrlo con los bins de vamb</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co">#se debe activar el ambiente metagenomics</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co">#checkm lineage_wf results/06.vamb/48hrs/bins results/checkm/ -x fna -t 4  -f results/checkm/checkm_vamb_bins.txt</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Y una captura de ejemplo de como se ve la salida de CheckM:</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="Figures/checkm_example.png" class="img-fluid figure-img" width="828"></p>
-</figure>
-</div>
+<p>En este taller no vamos a correr CheckM para los resultados de cada <em>binneador</em> porque uno de los programas de refinamiento que usaremos ya lo corren de forma interna, sin embargo, es útil correrlo para tener una idea clara sobre la calidad de los bins que vamos obteniendo.</p>
+<p>Vamos a correrlo sólo como ejemplo para los resultados de Vamb para que podamos conocerlo.</p>
+<p>Activamos el ambiente:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> activate checkm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATHC -J checkm </span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH -t 0</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH -e outs/06b.checkm.err</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH -o outs/06b.checkm.out</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --export=ALL</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="co">#Crea el directorio para los resultados de vamb</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> results/06.vamb</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="co"># La linea para vamb</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="ex">vamb</span> <span class="at">--fasta</span> results/02.ensambles/48hrs.fasta <span class="at">--bamfiles</span> results/03.profundidad/48hrs_sorted.bam <span class="at">--minfasta</span> 500000 <span class="at">--outdir</span> results/06.vamb/48hrs</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Ejemplo de como correrlo con los bins de vamb</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="co"># llamamos a las bases de datos</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">CHECKM_DATA_PATH</span><span class="op">=</span>/lustre/databases/metagenomica/checkM/</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a><span class="co"># ejecutamos checkm</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a><span class="ex">checkm</span> lineage_wf results/06.vamb/48hrs/bins/ results/06.vamb/48hrs/checkm <span class="at">-x</span> fna <span class="at">-t</span> 4 <span class="at">-f</span> results/06.vamb/48hrs/checkm_vamb.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Y ahora si, a refinar los <em>bins</em> … 🥳</p>
 </section>
 <section id="binning_refiner" class="level3 page-columns page-full">
@@ -580,74 +613,67 @@ Otros programas para binning
 </div>
 <p><a href="https://doi.org/10.1093/bioinformatics/btx086" class="uri">https://doi.org/10.1093/bioinformatics/btx086</a></p>
 <p>Necesitamos crear el directorio de resultados para binning_refiner y un directorio con los bins generados por cada programa</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> results/07.binning_refiner/48hrsbins/<span class="dt">{metabat</span><span class="op">,</span><span class="dt">maxbin</span><span class="op">,</span><span class="dt">vamb}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> results/07.binning_refiner/48hrsbins/<span class="dt">{metabat</span><span class="op">,</span><span class="dt">maxbin</span><span class="op">,</span><span class="dt">vamb}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Ahora vamos a crear ligas simbólicas de los <em>bins</em> generados por cada herramienta.</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">#metabat</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> results/07.binning_refiner/48hrsbins/metabat/</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ln</span> <span class="at">-s</span> ../../../04.metabat/<span class="pp">*</span>.fa .</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co">#maxbin</span></span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ../maxbin/</span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ln</span> <span class="at">-s</span> ../../../05.maxbin/<span class="pp">*</span>.fasta .</span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="co"># vamb</span></span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ../vamb/</span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ln</span> <span class="at">-s</span> ../../../06.vamb/48hrs/bins/<span class="pp">*</span>.fna .</span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a><span class="co">#regresar</span></span>
-<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ../../</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">#metabat</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> results/07.binning_refiner/48hrsbins/metabat/</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ln</span> <span class="at">-s</span> ../../../04.metabat/<span class="pp">*</span>.fa .</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co">#maxbin</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ../maxbin/</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ln</span> <span class="at">-s</span> ../../../05.maxbin/<span class="pp">*</span>.fasta .</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="co"># vamb</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ../vamb/</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ln</span> <span class="at">-s</span> ../../../06.vamb/48hrs/bins/<span class="pp">*</span>.fna .</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a><span class="co">#regresar</span></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ../../</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Ahora si, corramos Binning_refiner</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Binning_refiner</span> <span class="at">-i</span> 48hrsbins/ <span class="at">-p</span> 48hrs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> activate mt-das-tool</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Binning_refiner</span> <span class="at">-i</span> 48hrsbins/ <span class="at">-p</span> 48hrs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Y regresemos a nuestro directorio principal</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> <span class="kw">&amp;&amp;</span> <span class="bu">cd</span> taller_metagenomica_pozol/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> <span class="kw">&amp;&amp;</span> <span class="bu">cd</span> taller_metagenomica_pozol/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Exploremos los resultados!</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> results/07.binning_refiner/48hrs_Binning_refiner_outputs/48hrs_sources_and_length.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="sourceCode" id="cb23"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>Refined_bin     Size(Kbp)       Source</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>48hrs_1 1535.49 48hrs_maxbin.004.fasta,metabat.5.fa,676.fna</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>48hrs_2 1506.01 48hrs_maxbin.002.fasta,metabat.3.fa,6952.fna</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>48hrs_3 1319.12 48hrs_maxbin.008.fasta,metabat.2.fa,28067.fna</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>48hrs_4 1263.79 48hrs_maxbin.005.fasta,metabat.9.fa,3736.fna</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>48hrs_5 1185.25 48hrs_maxbin.001.fasta,metabat.11.fa,15732.fna</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>48hrs_6 1052.67 48hrs_maxbin.003.fasta,metabat.4.fa,15732.fna</span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>48hrs_7 557.49  48hrs_maxbin.006.fasta,metabat.1.fa,28990.fna</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> results/07.binning_refiner/48hrs_Binning_refiner_outputs/48hrs_sources_and_length.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Copia y pega este contenido en la consola de Rscript</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cargar las librerias</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(networkD3)</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="co"># revisa tu ubicación</span></span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="fu">getwd</span>()</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="co"># OJO</span></span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="fu">setwd</span>(<span class="st">"/home/ELALUMNOQUEERES/taller_metagenomica_pozol"</span>)</span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Cargar los datos</span></span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>sankey_data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"results/07.binning_refiner/48hrs_Binning_refiner_outputs/48hrs_sankey.csv"</span>)</span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Crear una lista de nodos únicos</span></span>
-<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>nodes <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">name =</span> <span class="fu">unique</span>(<span class="fu">c</span>(sankey_data<span class="sc">$</span>C1, sankey_data<span class="sc">$</span>C2)))</span>
-<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Crear el dataframe de enlaces</span></span>
-<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>links <span class="ot">&lt;-</span> sankey_data <span class="sc">%&gt;%</span></span>
-<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">source =</span> <span class="fu">match</span>(C1, nodes<span class="sc">$</span>name) <span class="sc">-</span> <span class="dv">1</span>,</span>
-<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">target =</span> <span class="fu">match</span>(C2, nodes<span class="sc">$</span>name) <span class="sc">-</span> <span class="dv">1</span>,</span>
-<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">value =</span> Length_Kbp) <span class="sc">%&gt;%</span></span>
-<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(source, target, value)</span>
-<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Crear el gráfico Sankey</span></span>
-<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>sankey_plot <span class="ot">&lt;-</span> <span class="fu">sankeyNetwork</span>(<span class="at">Links =</span> links, <span class="at">Nodes =</span> nodes,</span>
-<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>                             <span class="at">Source =</span> <span class="st">"source"</span>, <span class="at">Target =</span> <span class="st">"target"</span>,</span>
-<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>                             <span class="at">Value =</span> <span class="st">"value"</span>, <span class="at">NodeID =</span> <span class="st">"name"</span>,</span>
-<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>                             <span class="at">fontSize =</span> <span class="dv">12</span>, <span class="at">nodeWidth =</span> <span class="dv">30</span>)</span>
-<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Mostrar el gráfico</span></span>
-<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a>sankey_plot</span>
-<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Guardar</span></span>
-<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(htmlwidgets)</span>
-<span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a><span class="fu">saveWidget</span>(sankey_plot, <span class="at">file =</span> <span class="st">"48hrs_sankey_plot.html"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cargar las librerias</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(networkD3)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="co"># revisa tu ubicación</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="fu">getwd</span>()</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="co"># OJO</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="fu">setwd</span>(<span class="st">"/home/ELALUMNOQUEERES/taller_metagenomica_pozol"</span>)</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Cargar los datos</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>sankey_data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"results/07.binning_refiner/48hrs_Binning_refiner_outputs/48hrs_sankey.csv"</span>)</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Crear una lista de nodos únicos</span></span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>nodes <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">name =</span> <span class="fu">unique</span>(<span class="fu">c</span>(sankey_data<span class="sc">$</span>C1, sankey_data<span class="sc">$</span>C2)))</span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Crear el dataframe de enlaces</span></span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>links <span class="ot">&lt;-</span> sankey_data <span class="sc">%&gt;%</span></span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">source =</span> <span class="fu">match</span>(C1, nodes<span class="sc">$</span>name) <span class="sc">-</span> <span class="dv">1</span>,</span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">target =</span> <span class="fu">match</span>(C2, nodes<span class="sc">$</span>name) <span class="sc">-</span> <span class="dv">1</span>,</span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">value =</span> Length_Kbp) <span class="sc">%&gt;%</span></span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(source, target, value)</span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Crear el gráfico Sankey</span></span>
+<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>sankey_plot <span class="ot">&lt;-</span> <span class="fu">sankeyNetwork</span>(<span class="at">Links =</span> links, <span class="at">Nodes =</span> nodes,</span>
+<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a>                             <span class="at">Source =</span> <span class="st">"source"</span>, <span class="at">Target =</span> <span class="st">"target"</span>,</span>
+<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>                             <span class="at">Value =</span> <span class="st">"value"</span>, <span class="at">NodeID =</span> <span class="st">"name"</span>,</span>
+<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a>                             <span class="at">fontSize =</span> <span class="dv">12</span>, <span class="at">nodeWidth =</span> <span class="dv">30</span>)</span>
+<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Mostrar el gráfico</span></span>
+<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a>sankey_plot</span>
+<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Guardar</span></span>
+<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(htmlwidgets)</span>
+<span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a><span class="fu">saveWidget</span>(sankey_plot, <span class="at">file =</span> <span class="st">"48hrs_sankey_plot.html"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="quarto-figure quarto-figure-center page-columns page-full">
 <figure class="figure page-columns page-full">
 <p><img src="Figures/07.sankey.png" class="img-fluid figure-img"></p>
@@ -664,17 +690,27 @@ Otros programas para binning
 <figcaption class="figure-caption margin-caption">DASTool</figcaption>
 </figure>
 </div>
-<p>Vamos a correr DASTool …</p>
-<p>Primero crea el directorio para los resultados</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> results/08.dastool</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>DASTool necesita como entrada un archivo tabular con información de los resultados de cada programa de <em>binning.</em></p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Fasta_to_Contig2Bin.sh</span> <span class="at">-i</span> results/04.metabat/ <span class="at">-e</span> fa <span class="op">&gt;</span> results/08.dastool/48hrs_metabat.dastool.tsv</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="ex">Fasta_to_Contig2Bin.sh</span> <span class="at">-i</span> results/05.maxbin/ <span class="at">-e</span> fasta <span class="op">&gt;</span> results/08.dastool/48hrs_maxbin.dastool.tsv</span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="ex">Fasta_to_Contig2Bin.sh</span> <span class="at">-i</span> results/06.vamb/48hrs/bins/ <span class="at">-e</span> fna <span class="op">&gt;</span> results/08.dastool/48hrs_vamb.dastool.tsv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Ya que tenemos los archivos tsv podemos empezar con el refinamiento!! 🥳</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="ex">DAS_Tool</span> <span class="at">-i</span> results/08.dastool/48hrs_metabat.dastool.tsv,results/08.dastool/48hrs_maxbin.dastool.tsv,results/08.dastool/48hrs_vamb.dastool.tsv <span class="at">-l</span> metabat,maxbin,vamb <span class="at">-c</span> results/02.ensambles/48hrs.fasta <span class="at">-o</span> results/08.dastool/48hrs <span class="at">-t</span> 4 <span class="at">--write_bins</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Vamos a correr DASTool … 🥳</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nano</span> src/08.dastool.slurm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATHC -J dastool</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH -t 0</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH -e outs/08.dastool.err</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH -o outs/08.dastool.out</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATCH --export=ALL</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">LC_ALL</span><span class="op">=</span>en_US.UTF-8</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Crear el directorio para los resultados</span></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> results/08.dastool</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a><span class="co"># DASTool necesita como entrada un archivo tabular con información de los resultados de cada programa de binning.</span></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a><span class="ex">Fasta_to_Contig2Bin.sh</span> <span class="at">-i</span> results/04.metabat/ <span class="at">-e</span> fa <span class="op">&gt;</span> results/08.dastool/48hrs_metabat.dastool.tsv</span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a><span class="ex">Fasta_to_Contig2Bin.sh</span> <span class="at">-i</span> results/05.maxbin/ <span class="at">-e</span> fasta <span class="op">&gt;</span> results/08.dastool/48hrs_maxbin.dastool.tsv</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a><span class="ex">Fasta_to_Contig2Bin.sh</span> <span class="at">-i</span> results/06.vamb/48hrs/bins/ <span class="at">-e</span> fna <span class="op">&gt;</span> results/08.dastool/48hrs_vamb.dastool.tsv</span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Ya que tenemos los archivos tsv podemos empezar con el refinamiento!!</span></span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a><span class="ex">DAS_Tool</span> <span class="at">-i</span> results/08.dastool/48hrs_metabat.dastool.tsv,results/08.dastool/48hrs_maxbin.dastool.tsv,results/08.dastool/48hrs_vamb.dastool.tsv <span class="at">-l</span> metabat,maxbin,vamb <span class="at">-c</span> results/02.ensambles/48hrs.fasta <span class="at">-o</span> results/08.dastool/48hrs <span class="at">-t</span> 4 <span class="at">--write_bins</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="section-1" class="level3">
 <h3 class="anchored" data-anchor-id="section-1"></h3>
@@ -704,8 +740,9 @@ Otros programas para binning
 <div class="sourceCode" id="cb31"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> <span class="kw">&amp;&amp;</span> <span class="bu">cd</span> taller_metagenomica_pozol/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Y ahora si, vamos a correr dRep …</p>
 <div class="sourceCode" id="cb32"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">PATH</span><span class="op">=</span>/miniconda3/envs/metagenomics/bin:<span class="va">$PATH</span></span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="ex">dRep</span> dereplicate results/09.drep/ <span class="at">-d</span> <span class="at">-comp</span> 50 <span class="at">-con</span> 10 <span class="at">--SkipSecondary</span> <span class="at">-g</span> results/09.drep/bins/<span class="pp">*</span>.fasta</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">PATH</span><span class="op">=</span>/lustre/apps/spack/opt/spack/linux-centos8-ivybridge/gcc-8.3.1/miniconda3-4.7.12.1-ubp7tlghaseisza4pqufq6sbehwa4pog/envs/checkm/bin:<span class="va">$PATH</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="ex">dRep</span> dereplicate results/09.drep/ <span class="at">-comp</span> 50 <span class="at">-con</span> 10  <span class="at">-g</span> results/09.drep/bins/<span class="pp">*</span>.fasta</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Este es uno de los plots generados por dRep, que representa los mejores bins desreplicados.</p>
 <div class="quarto-figure quarto-figure-center page-columns page-full">
 <figure class="figure page-columns page-full">
@@ -722,16 +759,18 @@ Otros programas para binning
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Para reflexionar
+Para tomar en cuenta
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Qué harías si antes de desreplicar tienes un bin que tiene 98 % de completitud y 11 % de contaminación?. dRep en automático lo descartaría.</p>
+<ul>
+<li><p>En la vida real, si el proyecto de metagenómica que estás desarrollando tiene librerías de diferentes muestras usarías dRep entre todos los conjuntos de <em>bins</em> ya refinados para no tener redundancia de genomas.</p></li>
+<li><p>Qué harías si antes de desreplicar tienes un bin que tiene 98 % de completitud y 11 % de contaminación?. dRep en automático lo descartaría.</p></li>
+</ul>
 <p>Propondrías alguna manera para quedarte con este bin y curarlo para reducir su contaminación?</p>
 <p>Por suerte hay más programas que pueden ayudarnos a curar nuestros bins manualmente, una herramienta útil para esto es <a href="https://kasperskytte.github.io/mmgenome2/articles/mmgenome2.html"><strong>mmgenome2</strong></a></p>
 </div>
 </div>
-<p>Para tomar en consideración:</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -764,7 +803,7 @@ Ejercicio 2
 <li><p>Discutan cada resultado obtenido.</p></li>
 <li><p>En la <a href="https://drive.google.com/drive/folders/1iKfhMz_JdfImmsCmkPg10r-NC-nrzhQ4?usp=sharing">carpeta compartida de Drive</a> busquen la presentación para el Ejercicio 2, en la diapositiva correspondiente resuman sus resultados obtenidos para que los presenten.</p></li>
 </ul>
-<p>Tiempo de actividad (1 hr)</p>
+<p>Tiempo de actividad (1.5 hr)</p>
 <p>Tiempo de presentación de resultados (5 min por equipo)</p>
 </div>
 </div>

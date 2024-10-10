@@ -16,7 +16,7 @@ Para correrlo vamos a activar el ambiente en el que se aloja.
 ## Activa el ambiente para PROKKA
 
 ``` bash
-conda activate Prokka_Global
+conda activate mt-prokka
 ```
 :::
 
@@ -55,20 +55,33 @@ Ahora que tenemos las proteínas predichas vamos a obtener más anotaciones úti
 
 [KofamScan](https://github.com/takaram/kofam_scan) es una herramienta de anotación, usa la base de datos KOfam de KEGG para obtener información sobre los genes que participan en diferentes rutas metabólicas.
 
-Vamos a crear el directorio de resultados
+Creamos el script para kofam
 
 ``` bash
-mkdir -p results/12.kofam
+nano src/12.kofam.slurm
 ```
 
-::: callout-caution
-## Ejemplo de como correr KOfamScan
-
-GHH
-
-KofamScan requiere mucho tiempo de ejecución. Para efectos del taller nosotros ya lo corrimos y te proporcionaremos los resultados. Pero te dejamos el bloque de código que usamos para este paso.
-
 ``` bash
+#!/bin/bash
+#SBATHC -J kofam
+#SBATCH -t 0
+#SBATCH -n 4
+#SBATCH -e outs/12.kofam.err
+#SBATCH -o outs/12.kofam.out
+#SBATCH --export=ALL
+#SBATCH -p q2
+#SBATCH -w compute4
+
+# Limpiamos por si las moscas :P
+module purge
+
+# Caragmos el modulo para kofam
+module load kofam-scan/1.3.0/gcc/8.3.1-n3v4
+
+# Creamos el directorio para alojar los resultados
+mkdir -p results/12.kofam
+
+# Lo corremos
 for FAA in $(ls results/11.prokka/*/*.faa); do
     name=$(basename $FAA .faa)
     exec_annotation $FAA \
@@ -76,15 +89,15 @@ for FAA in $(ls results/11.prokka/*/*.faa); do
         --report-unannotated \
         --cpu 4 \
         --tmp-dir results/12.kofam/"tmp$name" \
-        -p /home/alumno1/kofam/db/profiles/ \
-        -k /home/alumno1/kofam/db/ko_list
+        -p /tmp/databases/KOfam/profiles/ \
+        -k /tmp/databases/KOfam/ko_list
 done
-# remover los directorios temporales
-#rm -r results/12.kofam/tmp*
-```
-:::
 
-Estos resultados ya los tienes en el directorio `results/12.kofam`
+# remover los directorios temporales
+rm -r results/12.kofam/tmp*
+```
+
+Estos resultados ya los tienes en el directorio `results/12.kofam` por si esta tardando mucho.
 
 Y ahora que ya tenemos los identificadores de KO para cada proteína, vamos a filtrar y graficar el metabolismo de los *bins*.
 

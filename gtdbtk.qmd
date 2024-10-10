@@ -14,7 +14,7 @@ Recordemos que ya tenemos un set de *bins* refinados y desreplicados. Ahora vamo
 ## Activa el ambiente de gtdbtk
 
 ``` bash
-conda activate gtdbtk-2.1.1
+conda activate gtdbtk-2.3.2
 ```
 :::
 
@@ -27,15 +27,26 @@ El directorio de resultados para gtdbtk ya lo tienes en tu carpeta de resultados
 Ahora si, vamos a correr gtdbtk
 
 ``` bash
-pip install numpy==1.19.5
-
-gtdbtk classify_wf --genome_dir results/10.gtdbtk/bins/ --out_dir results/10.gtdbtk/ --cpus 4 -x fasta
+nano src/10.gtdbtk.slurm
 ```
 
-No olvides desactivar el ambiente
-
 ``` bash
-conda deactivate
+#!/bin/bash
+#SBATHC -J gtdbtk
+#SBATCH -t 0
+#SBATCH -n 4
+#SBATCH -e outs/10.gtdbtk2.err
+#SBATCH -o outs/10.gtdbtk2.out
+#SBATCH --export=ALL
+#SBATCH -p q2
+#SBATCH -w compute4
+
+
+# Llamamos a la base de datos
+export GTDBTK_DATA_PATH=/tmp/databases/gtdb-tk/release207_v2
+
+# ahora si corremos gtdbtk
+gtdbtk classify_wf --genome_dir results/10.gtdbtk/bins/ --out_dir results/10.gtdbtk/ --cpus 4 -x fasta --mash_db /tmp/databases/gtdb-tk/release207_v2/mash/ # --skip_ani_screen
 ```
 
 ::: callout-caution

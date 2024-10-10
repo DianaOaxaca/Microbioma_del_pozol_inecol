@@ -7,7 +7,7 @@ La metagenómica hace referencia al estudios de todo el ADN de los organismos qu
 Típicamente los metagenomas pueden estudiarse mediante dos aproximaciones:
 
 1.  La clasificación taxonómica de contigs o lecturas y la inferencia metabólica de los contigs.
-2.  La reconstrucción de genomas a partir de metagenomas (MAGs), clasificación taxonómica y la inferencia metabólica de los MAGs.
+2.  La reconstrucción de genomas a partir de metagenomas ([MAGs](https://merenlab.org/momics/)), clasificación taxonómica y la inferencia metabólica de los MAGs.
 
 En este apartado nos enfocaremos en la segunda aproximación. Los MAGs se reconstruyen a partir de un ensamble metagenómico, los contigs de dicho ensamble se agrupan mediante la información de cobertura y frecuencia de tetranucleótidos. Esta agrupación puede generar errores, por lo que es indispensable evaluar la calidad de los MAGs mediante la completitud y redundancia de genes de copia única ([MerenLab y col.](https://anvio.org/vocabulary/))
 
@@ -196,7 +196,9 @@ Y lo ejecutamos:
 sbatch src/05.maxbin.slurm
 ```
 
-::: {.callout-important collapse="true" title="Ejercicio:"}
+::: {.callout-important title="Responde:"}
+## Responde
+
 1\. ¿Cuántos bins se formaron?
 
 2\. ¿Qué porcentaje de completitud tienen??
@@ -225,30 +227,43 @@ conda deactivate
 -   
 
     ``` bash
-    conda activate binning
+    conda activate mt-vamb
     ```
 :::
 
-Vamos a correr vamb, pero primero crea el directorio de resultados
+Crea el script para vamb:
 
 ``` bash
+#!/bin/bash
+#SBATHC -J Vamb 
+#SBATCH -t 0
+#SBATCH -e outs/06.vamb.err
+#SBATCH -o outs/06.vamb.out
+#SBATCH --export=ALL
+
+#Crea el directorio para los resultados de vamb
 mkdir -p results/06.vamb
-```
 
-Ejecutemos vamb:
-
-``` bash
-vamb --fasta results/02.ensambles/48hrs.fasta --jgi results/03.profundidad/48hrs.mgh_depth.txt --minfasta 500000 --outdir results/06.vamb/48hrs
+# La linea para vamb
+vamb --fasta results/02.ensambles/48hrs.fasta --bamfiles results/03.profundidad/48hrs_sorted.bam --minfasta 500000 --outdir results/06.vamb/48hrs
 ```
 
 ::: callout-important
-Si quisieras recuperar los genomas de virus ¿Qué parámetro cambiarías?
+Si quisieras recuperar los genomas de virus ¿Qué cambiarías?
 :::
 
 ::: callout-tip
 ## Otros programas para binning
 
 Recientemente se publicó COMEBin, que utiliza un enfoque distinto a lo que hemos usado en este tutorial. En el siguiente [link](https://github.com/ziyewang/COMEBin) encontrarás el manual y una explicación general sobre su funcionamiento.
+:::
+
+::: callout-caution
+## No olvides descatvar el ambiente
+
+``` bash
+conda deactivate
+```
 :::
 
 ## Refinamiento
@@ -261,25 +276,44 @@ Para disminuir la contaminación e incrementar la completitud hay algunos progra
 
 ### CheckM
 
-Antes de proceder al refinamiento es necesario tener claro cómo se evalúa la completitud y contaminación de los *bins.* Para esta evaluación se usa [CheckM](https://github.com/Ecogenomics/CheckM/wiki/Workflows#lineage-specific-workflow) que se ha convertido en una herramienta estándar para la evaluación de la calidad de genomas y MAGs, y es usada por la mayoría de programas de refinamiento.
+Antes de proceder al refinamiento es necesario tener claro cómo se evalúa la completitud y contaminación de los *bins.* Para esta evaluación se usa [CheckM](https://github.com/Ecogenomics/CheckM/wiki/Workflows#lineage-specific-workflow) que se ha convertido en una herramienta estándar para la evaluación de la [calidad de genomas](https://genome.cshlp.org/content/25/7/1043/T3.expansion.html) y MAGs, y es usada por la mayoría de programas de refinamiento.
 
 Para hacer esta evaluación, CheckM utiliza una serie de herramientas: `tree` organiza los genomas en un árbol de referencia. `tree_qa` evalúa la cantidad de genes marcadores filogenéticos y su ubicación en el árbol. El comando `lineage_set` crea un archivo de marcadores específicos de linaje, que se usa en el comando `analyze` para evaluar la integridad y contaminación de los genomas. Finalmente, el comando `qa` genera tablas que resumen la calidad de los genomas.
 
 ![CheckM Workflow](Figures/CheckM_workflow.png){fig-align="center" width="444"}
 
-En este taller no vamos a correr CheckM porque los programas de refinamiento que usaremos ya lo corren de forma interna, sin embargo, es útil correrlo para tener una idea clara sobre la calidad de los bins que obtengamos.
+En este taller no vamos a correr CheckM para los resultados de cada *binneador* porque uno de los programas de refinamiento que usaremos ya lo corren de forma interna, sin embargo, es útil correrlo para tener una idea clara sobre la calidad de los bins que vamos obteniendo.
 
-Te dejamos la siguiente línea para que la uses en tus proyectos.
+Vamos a correrlo sólo como ejemplo para los resultados de Vamb para que podamos conocerlo.
+
+Activamos el ambiente:
 
 ``` bash
-#ejemplo de como correrlo con los bins de vamb
-#se debe activar el ambiente metagenomics
-#checkm lineage_wf results/06.vamb/48hrs/bins results/checkm/ -x fna -t 4  -f results/checkm/checkm_vamb_bins.txt
+conda activate checkm
 ```
 
-Y una captura de ejemplo de como se ve la salida de CheckM:
+``` bash
+#!/bin/bash
+#SBATHC -J checkm 
+#SBATCH -t 0
+#SBATCH -e outs/06b.checkm.err
+#SBATCH -o outs/06b.checkm.out
+#SBATCH --export=ALL
 
-![](Figures/checkm_example.png){fig-align="center" width="828"}
+
+#Crea el directorio para los resultados de vamb
+mkdir -p results/06.vamb
+
+# La linea para vamb
+vamb --fasta results/02.ensambles/48hrs.fasta --bamfiles results/03.profundidad/48hrs_sorted.bam --minfasta 500000 --outdir results/06.vamb/48hrs
+
+# Ejemplo de como correrlo con los bins de vamb
+# llamamos a las bases de datos
+export CHECKM_DATA_PATH=/lustre/databases/metagenomica/checkM/
+
+# ejecutamos checkm
+checkm lineage_wf results/06.vamb/48hrs/bins/ results/06.vamb/48hrs/checkm -x fna -t 4 -f results/06.vamb/48hrs/checkm_vamb.txt
+```
 
 Y ahora si, a refinar los *bins* ... 🥳
 
@@ -321,6 +355,10 @@ cd ../../
 Ahora si, corramos Binning_refiner
 
 ``` bash
+conda activate mt-das-tool
+```
+
+``` bash
 Binning_refiner -i 48hrsbins/ -p 48hrs
 ```
 
@@ -334,17 +372,6 @@ Exploremos los resultados!
 
 ``` bash
 cat results/07.binning_refiner/48hrs_Binning_refiner_outputs/48hrs_sources_and_length.txt
-```
-
-``` markdown
-Refined_bin     Size(Kbp)       Source
-48hrs_1 1535.49 48hrs_maxbin.004.fasta,metabat.5.fa,676.fna
-48hrs_2 1506.01 48hrs_maxbin.002.fasta,metabat.3.fa,6952.fna
-48hrs_3 1319.12 48hrs_maxbin.008.fasta,metabat.2.fa,28067.fna
-48hrs_4 1263.79 48hrs_maxbin.005.fasta,metabat.9.fa,3736.fna
-48hrs_5 1185.25 48hrs_maxbin.001.fasta,metabat.11.fa,15732.fna
-48hrs_6 1052.67 48hrs_maxbin.003.fasta,metabat.4.fa,15732.fna
-48hrs_7 557.49  48hrs_maxbin.006.fasta,metabat.1.fa,28990.fna
 ```
 
 Copia y pega este contenido en la consola de Rscript
@@ -395,27 +422,31 @@ saveWidget(sankey_plot, file = "48hrs_sankey_plot.html")
 
 ![DASTool](Figures/06.DASTool.png){fig-alt="Sieber et al. 2018. Recovery of genomes from metagenomes via a dereplication, aggregation and scoring strategy. Nat. Micro." fig-align="center" width="935"}
 
-Vamos a correr DASTool ...
-
-Primero crea el directorio para los resultados
+Vamos a correr DASTool ... 🥳
 
 ``` bash
+nano src/08.dastool.slurm
+```
+
+``` bash
+#!/bin/bash
+#SBATHC -J dastool
+#SBATCH -t 0
+#SBATCH -e outs/08.dastool.err
+#SBATCH -o outs/08.dastool.out
+#SBATCH --export=ALL
+
+export LC_ALL=en_US.UTF-8
+
+# Crear el directorio para los resultados
 mkdir -p results/08.dastool
-```
 
-DASTool necesita como entrada un archivo tabular con información de los resultados de cada programa de *binning.*
-
-``` bash
+# DASTool necesita como entrada un archivo tabular con información de los resultados de cada programa de binning.
 Fasta_to_Contig2Bin.sh -i results/04.metabat/ -e fa > results/08.dastool/48hrs_metabat.dastool.tsv
-
 Fasta_to_Contig2Bin.sh -i results/05.maxbin/ -e fasta > results/08.dastool/48hrs_maxbin.dastool.tsv
-
 Fasta_to_Contig2Bin.sh -i results/06.vamb/48hrs/bins/ -e fna > results/08.dastool/48hrs_vamb.dastool.tsv
-```
 
-Ya que tenemos los archivos tsv podemos empezar con el refinamiento!! 🥳
-
-``` bash
+# Ya que tenemos los archivos tsv podemos empezar con el refinamiento!!
 DAS_Tool -i results/08.dastool/48hrs_metabat.dastool.tsv,results/08.dastool/48hrs_maxbin.dastool.tsv,results/08.dastool/48hrs_vamb.dastool.tsv -l metabat,maxbin,vamb -c results/02.ensambles/48hrs.fasta -o results/08.dastool/48hrs -t 4 --write_bins
 ```
 
@@ -461,8 +492,9 @@ Y ahora si, vamos a correr dRep ...
 
 ``` bash
 
-export PATH=/miniconda3/envs/metagenomics/bin:$PATH
-dRep dereplicate results/09.drep/ -d -comp 50 -con 10 --SkipSecondary -g results/09.drep/bins/*.fasta
+export PATH=/lustre/apps/spack/opt/spack/linux-centos8-ivybridge/gcc-8.3.1/miniconda3-4.7.12.1-ubp7tlghaseisza4pqufq6sbehwa4pog/envs/checkm/bin:$PATH
+
+dRep dereplicate results/09.drep/ -comp 50 -con 10  -g results/09.drep/bins/*.fasta
 ```
 
 Este es uno de los plots generados por dRep, que representa los mejores bins desreplicados.
@@ -478,16 +510,16 @@ conda deactivate
 ------------------------------------------------------------------------
 
 ::: callout-important
-## Para reflexionar
+## Para tomar en cuenta
 
-Qué harías si antes de desreplicar tienes un bin que tiene 98 % de completitud y 11 % de contaminación?. dRep en automático lo descartaría.
+-   En la vida real, si el proyecto de metagenómica que estás desarrollando tiene librerías de diferentes muestras usarías dRep entre todos los conjuntos de *bins* ya refinados para no tener redundancia de genomas.
+
+-   Qué harías si antes de desreplicar tienes un bin que tiene 98 % de completitud y 11 % de contaminación?. dRep en automático lo descartaría.
 
 Propondrías alguna manera para quedarte con este bin y curarlo para reducir su contaminación?
 
 Por suerte hay más programas que pueden ayudarnos a curar nuestros bins manualmente, una herramienta útil para esto es [**mmgenome2**](https://kasperskytte.github.io/mmgenome2/articles/mmgenome2.html)
 :::
-
-Para tomar en consideración:
 
 ::: callout-tip
 ## Tip
@@ -512,7 +544,7 @@ Ahora te toca a tí.
 
 -   En la [carpeta compartida de Drive](https://drive.google.com/drive/folders/1iKfhMz_JdfImmsCmkPg10r-NC-nrzhQ4?usp=sharing) busquen la presentación para el Ejercicio 2, en la diapositiva correspondiente resuman sus resultados obtenidos para que los presenten.
 
-Tiempo de actividad (1 hr)
+Tiempo de actividad (1.5 hr)
 
 Tiempo de presentación de resultados (5 min por equipo)
 :::

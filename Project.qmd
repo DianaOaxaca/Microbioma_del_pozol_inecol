@@ -22,10 +22,10 @@ title: "Preparemos todo para el proyecto"
 # ve al $HOME
 cd
 # copia los directorios de trabajo
-# metagenómica
-cp -r /home/alumno1/taller_metagenomica_pozol .
-# amplicones
-cp -r /home/alumno1/taller_amplicones_pozol .
+# descarga
+wget https://zenodo.org/records/13911654/files/taller_metagenomica_pozol.tar.gz?download=1 -O taller_metagenomica_pozol.tar.gz
+# descomprime
+tar -xvzf taller_metagenomica_pozol.tar.gz
 ```
 
 3.  Entra al directorio del proyecto
