@@ -117,6 +117,9 @@ nano src/04.metabat.slurm
 #SBATCH -e outs/04.metabat.err
 #SBATCH -o outs/04.metabat.out
 #SBATCH --export=ALL
+#SBATCH -n 6
+#SBATCH -p q2
+#SBATCH --mem 8G
 
 metabat2 -i results/02.ensambles/48hrs.fasta -a results/03.profundidad/48hrs.mgh_depth.txt -o results/04.metabat/metabat -t 6 -m 1500
 ```
@@ -180,6 +183,9 @@ nano src/05.maxbin.slurm
 #SBATCH -e outs/05.maxbin.err
 #SBATCH -o outs/05.maxbin.out
 #SBATCH --export=ALL
+#SBATCH -n 6
+#SBATCH -p q2
+#SBATCH --mem 8G
 
 #Crea el directorio para los resultados de MaxBin2
 
@@ -240,6 +246,9 @@ Crea el script para vamb:
 #SBATCH -e outs/06.vamb.err
 #SBATCH -o outs/06.vamb.out
 #SBATCH --export=ALL
+#SBATCH -n 6
+#SBATCH -p q2
+#SBATCH --mem 8G
 
 #Crea el directorio para los resultados de vamb
 mkdir -p results/06.vamb
@@ -299,7 +308,9 @@ conda activate checkm
 #SBATCH -e outs/06b.checkm.err
 #SBATCH -o outs/06b.checkm.out
 #SBATCH --export=ALL
-
+#SBATCH -n 6
+#SBATCH -p q2
+#SBATCH --mem 8G
 
 #Crea el directorio para los resultados de vamb
 mkdir -p results/06.vamb
@@ -435,6 +446,9 @@ nano src/08.dastool.slurm
 #SBATCH -e outs/08.dastool.err
 #SBATCH -o outs/08.dastool.out
 #SBATCH --export=ALL
+#SBATCH -n 6
+#SBATCH -p q2
+#SBATCH --mem 8G
 
 export LC_ALL=en_US.UTF-8
 
