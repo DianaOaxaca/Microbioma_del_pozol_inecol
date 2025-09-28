@@ -12,17 +12,17 @@ website:
   title: "Microbioma del pozol"
   navbar:
     left:
-      - href: index.qmd
+      - href: 00.index.qmd
         text: Taller de Metagenómica centrada en Genomas
-      - href: about.qmd
+      - href: 01.about.qmd
         text: El pozol
-      - href: Project.qmd
+      - href: 02.ProjectRules.qmd
         text: 01.Espacio de trabajo
-      - href: 02.Binning.qmd
+      - href: 03.Binning.qmd
         text: 02.MAGs
-      - href: gtdbtk.qmd
+      - href: 04.Taxonomy.qmd
         text: 03.Taxonomía
-      - href: metabolic.qmd
+      - href: 05.Metabolic.qmd
         text: 04.Metabolismo
       - href: Recursos_extra.qmd
         text: Recursos_extra

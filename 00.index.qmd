@@ -1,0 +1,41 @@
+---
+title: "Microbioma_del_pozol"
+---
+
+**Taller de Análisis de Metagenomas, Reconstrucción de Genomas y Análisis de Amplicones.**
+
+En este taller introductorio aprenderemos a organizar un proyecto, analizar y visualizar datos metagenómicos; reconstruir genomas a partir de metagenomas (**MAGs**), a clasificar los MAGs taxonómicamente y a predecir sus genes e inferir su metabolismo.
+
+------------------------------------------------------------------------
+
+## Temario
+
+**Jueves**
+
+| Hora          | Tema                                |
+|---------------|-------------------------------------|
+| 10:00 - 10:30 | Introducción a la metagenómica      |
+| 10:30 - 11:00 | Espacio de trabajo, recapitulación. |
+| 11:00 - 11:30 | Ejercicio 1                         |
+| 11:30 - 12:30 | Reconstrucción de genomas           |
+| 12:30 - 12:45 | Descanso                            |
+| 12:45 - 13:30 | Refinamiento                        |
+| 13:30 - 14:00 | Desreplicación                      |
+| 14:00 - 15:00 | Comida                              |
+| 15:00 - 17:00 | Ejercicio 2                         |
+| 17:00 - 18:00 | Discusión de resultados             |
+
+**Viernes**
+
+| Hora          | Tema                                                    |
+|---------------|---------------------------------------------------------|
+| 10:00 - 11:00 | Asignación taxonómica                                   |
+| 11:00 - 12:00 | Predicción génica                                       |
+| 12:00 - 12:30 | Anotación                                               |
+| 12:30 - 12:45 | Descanso                                                |
+| 12:45- 13:30  | Plática sobre el microbioma del chinicuil               |
+| 13:30 - 14:00 | Revisión de resultados                                  |
+| 14:00 - 15:00 | Comida                                                  |
+| 15:00 - 16:00 | Rbims                                                   |
+| 16:00 - 17:00 | Otras inferencias metabólicas y discusión de resultados |
+|               |                                                         |

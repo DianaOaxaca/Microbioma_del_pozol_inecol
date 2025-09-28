@@ -1,0 +1,585 @@
+---
+title: "Genomas a partir de metagenomas"
+---
+
+La metagenómica hace referencia al estudio de todo el ADN de los organismos que se encuentran en un ambiente. La secuenciación de este material genético produce lecturas que pueden ensamblarse para conocer la diversidad microbiana y sus funciones.
+
+Típicamente los metagenomas pueden estudiarse mediante dos aproximaciones:
+
+1.  La clasificación taxonómica de contigs o lecturas y la inferencia metabólica de los contigs.
+2.  La reconstrucción de genomas a partir de metagenomas ([MAGs](https://merenlab.org/momics/)), clasificación taxonómica y la inferencia metabólica de los MAGs.
+
+En este apartado nos enfocaremos en la segunda aproximación. Los MAGs se reconstruyen a partir de un ensamble metagenómico, los contigs de dicho ensamble se agrupan mediante la información de cobertura y frecuencia de tetranucleótidos. Esta agrupación puede generar errores, por lo que es indispensable evaluar la calidad de los MAGs mediante la completitud y redundancia de genes de copia única ([MerenLab y col.](https://anvio.org/vocabulary/))
+
+Para obtener MAGs podemos seguir el siguiente flujo de análisis:
+
+![Figura 2. Metagenómica Centrada en Genomas](Figures/02.MAGs_workflow.png){fig-align="center"}
+
+En los días anteriores aprendieron a evaluar la calidad de las lecturas, filtrarlas y ensamblarlas, por lo que este apartado comenzará con un ensamble ya generado.
+
+De acuerdo con el flujo de análisis (Figura 2), debemos partir de un ensamble, mapear las lecturas y obtener un archivo de profundidad de cada contig en el ensamble.
+
+:::: callout-caution
+## Nota
+
+El proceso de mapeo es demandante en tiempo de ejecución y recursos. Así que nos dimos a la tarea de generar el archivo de profundidad para comenzar directamente con el *binning*.
+
+El mapeo lo corrimos con [bowtie2](https://bowtie-bio.sourceforge.net/bowtie2/manual.shtml#introduction) que es una herramienta confiable y muy utilizada para alinear lecturas cortas a una referencia, en nuestro caso, la referencia es el ensamble metagenómico de la muestra de 48hrs.
+
+Bowtie2 genera un archivo de mapeo (SAM) que debe convertirse a un formato binario (BAM), para esta conversión usamos [samtools](https://github.com/samtools/) que contiene multiples sub herramientas para trabajar con archivos de mapeos.
+
+Para generar este archivo se utilizaron las siguientes lineas de código.
+
+``` bash
+# Formatear el ensamble
+bowtie2-build results/02.ensambles/megahit/48hrs/48hrs.fasta results/03.profundidad/48hrs --threads 40
+# Mapear las lecturas contra el ensamble
+bowtie2 -x results/03.profundidad/48hrs -1 data/48hrs_sm_R1.fastq -2 data/48hrs_sm_R2.fastq -p 40 -S results/03.profundidad/48hrs.sam
+# Convertir de SAM a BAM y ordenar
+samtools view -Sb -O BAM -@ 40 results/03.profundidad/48hrs.sam | samtools sort -@ 40  -o results/03.profundidad/48hrs_sorted.bam
+# Obtener el índice
+samtools index results/03.profundidad/48hrs_sorted.bam
+```
+
+Ya que generamos el archivo bam ordenado obtuvimos un archivo con la información de cobertura de cada contig dentro del ensamble, este **archivo de profundidad** se generó con `jgi_summarize_bam_contig_depths` que es una herramienta desarrollada por el JGI.
+
+``` bash
+# jgi
+#Obtener el archivo de profundidad de cada contig
+jgi_summarize_bam_contig_depths  --outputDepth results/03.profundidad/48hrs.mgh_depth.txt results/03.profundidad/48hrs_sorted.bam
+```
+
+::: callout-warning
+## Atención
+
+No las ejecutes, sólo son un ejemplo para que las puedas usar con tus propios datos en el futuro.
+:::
+::::
+
+### 
+
+::: callout-caution
+## Ejercicio 1
+
+Antes de comenzar, reúnete con tu equipo y juntos
+
+-   Revisen nuevamente el contenido de los directorios `02.ensambles` y `03.profundidad.txt`
+
+-   Discutan y en una diapositiva expliquen el flujo teórico que se siguió para obtener los archivos que están en esos directorios.
+
+La liga de drive para ir trabajando durante el taller es esta: <https://docs.google.com/presentation/d/1f4vaJ_fV_8-i-dja2wtFx55vRkgeAB5Y4s-opCvFI1k/edit?usp=sharing>
+:::
+
+## Binning
+
+Ahora si, vamos a agrupar los contigs del metaensamble en *bins* ...
+
+### Metabat2
+
+[Metabat2](https://bitbucket.org/berkeleylab/metabat/src/master/) es una herramienta que agrupa los contigs tomando la cobertura de cada contig y calcula su composición nucleotídica.
+
+Para correr metabat necesitamos activar el [ambiente conda](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#activating-an-environment) donde se aloja.
+
+![Metabat2. Kang et al., 2015. DOI:10.7717/peerj.1165](Figures/04.Metabat.png){fig-align="center" width="473"}
+
+::: callout-caution
+## Activar ambiente para Metabat2
+
+-   
+
+    ``` bash
+    conda activate metabat2
+    ```
+:::
+
+Ahora que ya tenemos el ambiente activado vamos a crear nuestro script de slurm para ejecutarlo.
+
+``` bash
+nano src/04.metabat.slurm
+```
+
+``` bash
+#!/bin/bash
+#SBATHC -J Metabat2 
+#SBATCH -t 0
+#SBATCH -e outs/04.metabat.err
+#SBATCH -o outs/04.metabat.out
+#SBATCH --export=ALL
+#SBATCH -n 6
+#SBATCH -N 1
+#SBATCH -p q2
+#SBATCH --mem 24G
+
+metabat2 -i results/02.ensambles/48hrs.fasta -a results/03.profundidad/48hrs.mgh_depth.txt -o results/04.metabat/metabat -t 6 -m 1500
+```
+
+Guarda tecleando `ctrl + o` `enter` y después `ctrl + x` `enter`
+
+Y ejecuta:
+
+``` bash
+sbatch src/04.metabat.slurm
+```
+
+:::: {.callout-important collapse="true" title="Responde:"}
+1.  ¿Cuántos bins se formaron?
+
+::: {.callout-tip collapse="true" title="Ayuda"}
+1.  `ls results/04.metabat/`
+:::
+::::
+
+Ya que corrimos Metabat2 vamos a ejecutar MaxBin2, pero primero necesitamos desactivar el ambiente:
+
+::: callout-caution
+## Desactiva el ambiente
+
+Para desactivar el ambiente debemos correr la siguiente linea:
+
+``` bash
+conda deactivate
+```
+:::
+
+### MaxBin2
+
+[MaxBin2](https://sourceforge.net/projects/maxbin/files/) agrupa los contigs de acuerdo a la información de cobertura, composición nucleotídica y genes **de marcadores de copia única**.
+
+Vamos a ejecutarlo, activemos el [ambiente conda](#0) donde se encuentra maxbin.
+
+::: callout-caution
+## Activar ambiente para MaxBin2
+
+-   
+
+    ``` bash
+    conda activate metagenomics
+    ```
+:::
+
+[![MaxBin2. Wu et al., 2014. https://doi.org/10.1186/2049-2618-2-26](Figures/03.Maxbin.png){width="471"}](https://doi.org/10.1186/2049-2618-2-26)
+
+Ahora si, vamos a crear el script y ejecutarlo.
+
+``` bash
+nano src/05.maxbin.slurm
+```
+
+``` bash
+#!/bin/bash
+#SBATHC -J Maxbin 
+#SBATCH -t 0
+#SBATCH -e outs/05.maxbin.err
+#SBATCH -o outs/05.maxbin.out
+#SBATCH --export=ALL
+#SBATCH -n 6
+#SBATCH -N 1
+#SBATCH -p q2
+#SBATCH --mem 24G
+
+#Crea el directorio para los resultados de MaxBin2
+
+mkdir -p results/05.maxbin
+
+# Linea para correrlo
+
+run_MaxBin.pl -thread 6 -min_contig_length 1500 -contig results/02.ensambles/48hrs.fasta -out results/05.maxbin/48hrs_maxbin -abund results/03.profundidad/48hrs.mgh_depth.txt
+```
+
+Y lo ejecutamos:
+
+``` bash
+sbatch src/05.maxbin.slurm
+```
+
+:::: {.callout-important title="Responde:"}
+## Responde
+
+1\. ¿Cuántos bins se formaron?
+
+2\. ¿Qué porcentaje de completitud tienen??
+
+::: {.callout-tip collapse="true" title="Solución"}
+1.  `ls results/05.maxbin/*.fasta | wc -l`
+2.  `cat results/05.maxbin/48hrs_maxbin.summary | column -t`
+:::
+::::
+
+::: callout-caution
+## Desactiva el ambiente
+
+``` bash
+conda deactivate
+```
+:::
+
+### Vamb
+
+[VAMB](https://vamb.readthedocs.io/en/latest/) utiliza una combinación de enfoques de aprendizaje profundo y técnicas de agrupamiento basándose en sus patrones de composición de nucleótidos y en la co-ocurrencia de sus frecuencias de cobertura.
+
+::: callout-caution
+## Activa el ambiente binning
+
+-   
+
+    ``` bash
+    conda activate mt-vamb
+    ```
+:::
+
+Crea el script para vamb:
+
+``` bash
+#!/bin/bash
+#SBATHC -J Vamb 
+#SBATCH -t 0
+#SBATCH -e outs/06.vamb.err
+#SBATCH -o outs/06.vamb.out
+#SBATCH --export=ALL
+#SBATCH -n 6
+#SBATCH -N 1
+#SBATCH -p q2
+#SBATCH --mem 32G
+
+#Crea el directorio para los resultados de vamb
+mkdir -p results/06.vamb
+
+# La linea para vamb
+vamb --fasta results/02.ensambles/48hrs.fasta --bamfiles results/03.profundidad/48hrs_sorted.bam --minfasta 500000 --outdir results/06.vamb/48hrs
+```
+
+::: callout-important
+Si quisieras recuperar los genomas de virus ¿Qué cambiarías?
+:::
+
+::: callout-tip
+## Otros programas para binning
+
+Recientemente se publicó COMEBin, que utiliza un enfoque distinto a lo que hemos usado en este tutorial. En el siguiente [link](https://github.com/ziyewang/COMEBin) encontrarás el manual y una explicación general sobre su funcionamiento.
+:::
+
+::: callout-caution
+## No olvides descatvar el ambiente
+
+``` bash
+conda deactivate
+```
+:::
+
+## Refinamiento
+
+Ya corrimos tres programas de *binning*, pero, recordemos que los agrupamientos pueden tener errores:
+
+![Contaminación de bins](Figures/05.Refinamiento.png){fig-align="center" width="260"}
+
+Para disminuir la contaminación e incrementar la completitud hay algunos programas que pueden ayudarnos. Entre ellos están Binning_refiner y DASTool.
+
+### CheckM
+
+Antes de proceder al refinamiento es necesario tener claro cómo se evalúa la completitud y contaminación de los *bins.* Para esta evaluación se usa [CheckM](https://github.com/Ecogenomics/CheckM/wiki/Workflows#lineage-specific-workflow) que se ha convertido en una herramienta estándar para la evaluación de la [calidad de genomas](https://genome.cshlp.org/content/25/7/1043/T3.expansion.html) y MAGs, y es usada por la mayoría de programas de refinamiento.
+
+Para hacer esta evaluación, CheckM utiliza una serie de herramientas: `tree` organiza los genomas en un árbol de referencia. `tree_qa` evalúa la cantidad de genes marcadores filogenéticos y su ubicación en el árbol. El comando `lineage_set` crea un archivo de marcadores específicos de linaje, que se usa en el comando `analyze` para evaluar la integridad y contaminación de los genomas. Finalmente, el comando `qa` genera tablas que resumen la calidad de los genomas.
+
+![CheckM Workflow](Figures/CheckM_workflow.png){fig-align="center" width="444"}
+
+En este taller no vamos a correr CheckM para los resultados de cada *binneador* porque uno de los programas de refinamiento que usaremos ya lo corren de forma interna, sin embargo, es útil correrlo para tener una idea clara sobre la calidad de los bins que vamos obteniendo.
+
+Vamos a correrlo sólo como ejemplo para los resultados de Vamb para que podamos conocerlo.
+
+Activamos el ambiente:
+
+``` bash
+conda activate checkm
+```
+
+``` bash
+#!/bin/bash
+#SBATHC -J checkm 
+#SBATCH -t 0
+#SBATCH -e outs/06b.checkm.err
+#SBATCH -o outs/06b.checkm.out
+#SBATCH --export=ALL
+#SBATCH -n 6
+#SBATCH -N 1
+#SBATCH -p q2
+#SBATCH --mem 32G
+
+#Crea el directorio para los resultados de vamb
+mkdir -p results/06.vamb
+
+# La linea para vamb
+vamb --fasta results/02.ensambles/48hrs.fasta --bamfiles results/03.profundidad/48hrs_sorted.bam --minfasta 500000 --outdir results/06.vamb/48hrs
+
+# Ejemplo de como correrlo con los bins de vamb
+# llamamos a las bases de datos
+export CHECKM_DATA_PATH=/lustre/databases/metagenomica/checkM/
+
+# ejecutamos checkm
+checkm lineage_wf results/06.vamb/48hrs/bins/ results/06.vamb/48hrs/checkm -x fna -t 4 -f results/06.vamb/48hrs/checkm_vamb.txt
+```
+
+Y ahora si, a refinar los *bins* ... 🥳
+
+### Binning_refiner
+
+[Binning_refiner](https://doi.org/10.1093/bioinformatics/btx086) se enfoca en refinar y fusionar los bins para mejorar la integridad y reducir la contaminación. Identifica *bins* que pueden representar el mismo genoma y los fusiona. Después elimina posibles contaminaciones, durante el proceso, Binning_refiner evalúa la calidad de los bins.
+
+[![Binning_refiner](Figures/Binning_refiner.png){fig-align="center" width="444"}](https://doi.org/10.1093/bioinformatics/btx086)
+
+<https://doi.org/10.1093/bioinformatics/btx086>
+
+Necesitamos crear el directorio de resultados para binning_refiner y un directorio con los bins generados por cada programa
+
+``` bash
+mkdir -p results/07.binning_refiner/48hrsbins/{metabat,maxbin,vamb}
+```
+
+Ahora vamos a crear ligas simbólicas de los *bins* generados por cada herramienta.
+
+``` bash
+#metabat
+cd results/07.binning_refiner/48hrsbins/metabat/
+
+ln -s ../../../04.metabat/*.fa .
+
+#maxbin
+cd ../maxbin/
+ln -s ../../../05.maxbin/*.fasta .
+
+# vamb
+cd ../vamb/
+ln -s ../../../06.vamb/48hrs/bins/*.fna .
+
+
+#regresar
+cd ../../
+```
+
+Ahora si, corramos Binning_refiner
+
+``` bash
+conda activate mt-das-tool
+```
+
+``` bash
+Binning_refiner -i 48hrsbins/ -p 48hrs
+```
+
+Y regresemos a nuestro directorio principal
+
+``` bash
+taller_metagenomica_pozol/
+```
+
+Exploremos los resultados!
+
+``` bash
+cat results/07.binning_refiner/48hrs_Binning_refiner_outputs/48hrs_sources_and_length.txt
+```
+
+Copia y pega este contenido en la consola de Rscript
+
+``` r
+# Cargar las librerias
+library(dplyr)
+library(networkD3)
+
+# revisa tu ubicación
+getwd()
+
+# OJO
+setwd("/home/ELALUMNOQUEERES/taller_metagenomica_pozol")
+
+# Cargar los datos
+sankey_data <- read.csv("results/07.binning_refiner/48hrs_Binning_refiner_outputs/48hrs_sankey.csv")
+
+# Crear una lista de nodos únicos
+nodes <- data.frame(name = unique(c(sankey_data$C1, sankey_data$C2)))
+
+# Crear el dataframe de enlaces
+links <- sankey_data %>%
+  mutate(source = match(C1, nodes$name) - 1,
+         target = match(C2, nodes$name) - 1,
+         value = Length_Kbp) %>%
+  select(source, target, value)
+
+# Crear el gráfico Sankey
+sankey_plot <- sankeyNetwork(Links = links, Nodes = nodes,
+                             Source = "source", Target = "target",
+                             Value = "value", NodeID = "name",
+                             fontSize = 12, nodeWidth = 30)
+
+# Mostrar el gráfico
+sankey_plot
+
+# Guardar
+library(htmlwidgets)
+saveWidget(sankey_plot, file = "48hrs_sankey_plot.html")
+```
+
+![Binning_refiner sankey plot](Figures/07.sankey.png){fig-align="center"}
+
+### DASTool
+
+[DASTool](https://github.com/cmks/DAS_Tool) es una herramienta utilizada para mejorar la calidad de los *bins*. Evalúa la integridad, combina los resultados de diferentes *bineadores* y por consenso selecciona los mejores *bins* de cada herramienta. Una vez que DASTool ha seleccionado los mejores bins, realiza un proceso de refinamiento para optimizar los resultados.
+
+![DASTool](Figures/06.DASTool.png){fig-alt="Sieber et al. 2018. Recovery of genomes from metagenomes via a dereplication, aggregation and scoring strategy. Nat. Micro." fig-align="center" width="935"}
+
+Vamos a correr DASTool ... 🥳
+
+``` bash
+nano src/08.dastool.slurm
+```
+
+``` bash
+#!/bin/bash
+#SBATHC -J dastool
+#SBATCH -t 0
+#SBATCH -e outs/08.dastool.err
+#SBATCH -o outs/08.dastool.out
+#SBATCH --export=ALL
+#SBATCH -n 6
+#SBATCH -N 1
+#SBATCH -p q2
+#SBATCH --mem 32G
+
+export LC_ALL=en_US.UTF-8
+
+# Crear el directorio para los resultados
+mkdir -p results/08.dastool
+
+# DASTool necesita como entrada un archivo tabular con información de los resultados de cada programa de binning.
+Fasta_to_Contig2Bin.sh -i results/04.metabat/ -e fa > results/08.dastool/48hrs_metabat.dastool.tsv
+Fasta_to_Contig2Bin.sh -i results/05.maxbin/ -e fasta > results/08.dastool/48hrs_maxbin.dastool.tsv
+Fasta_to_Contig2Bin.sh -i results/06.vamb/48hrs/bins/ -e fna > results/08.dastool/48hrs_vamb.dastool.tsv
+
+# Ya que tenemos los archivos tsv podemos empezar con el refinamiento!!
+DAS_Tool -i results/08.dastool/48hrs_metabat.dastool.tsv,results/08.dastool/48hrs_maxbin.dastool.tsv,results/08.dastool/48hrs_vamb.dastool.tsv -l metabat,maxbin,vamb -c results/02.ensambles/48hrs.fasta -o results/08.dastool/48hrs -t 4 --write_bins
+```
+
+### 
+
+## Dereplicación
+
+### dRep
+
+La desreplicación es el proceso de identificar conjuntos de genomas que son "iguales" en una lista de genomas y eliminar todos los genomas excepto el "mejor" de cada conjunto redundante. [dRep](https://drep.readthedocs.io/en/latest/overview.html) es una herramienta útil para esto.
+
+[![dRep](Figures/dRep.png){fig-align="center" width="423"}](https://drep.readthedocs.io/en/latest/overview.html)
+
+Ya que tenemos los resultados de los dos refinadores ejecutaremos dRep para desreplicar y seleccionar el mejor representante de cada *bin*.
+
+Primero vamos a crear el directorio de resultados para dRep.
+
+``` bash
+mkdir -p results/09.drep/bins
+```
+
+Y entraremos al directorio bins dentro del directorio de resultados para colocar los bins que queremos comparar. En este caso los generados por ambos refinadores.
+
+``` bash
+cd results/09.drep/bins/
+```
+
+Con las siguientes lineas podemos copiar los bins en este directorio:
+
+``` bash
+for i in $(ls ../../08.dastool/48hrs_DASTool_bins/*.fa) ; do name=$(basename $i .fa); cp $i $name".fasta" ; done
+
+cp ../../07.binning_refiner/48hrs_Binning_refiner_outputs/48hrs_refined_bins/*.fasta .
+```
+
+Ya que los copiamos, regresemos al directorio principal.
+
+``` bash
+cd && cd taller_metagenomica_pozol/
+```
+
+Y ahora si, vamos a correr dRep ...
+
+``` bash
+#!/bin/bash
+#SBATHC -J drep
+#SBATCH -t 0
+#SBATCH -e outs/09.drep.err
+#SBATCH -o outs/09.drep.out
+#SBATCH --export=ALL
+#SBATCH -n 1
+#SBATCH -N 1
+#SBATCH -p q2
+#SBATCH --mem 160G
+
+export CHECKM_DATA_PATH=/lustre/apps/spack/opt/spack/linux-centos8-ivybridge/gcc-8.3.1/miniconda3-4.7.12.1-ubp7tlghaseisza4pqufq6sbehwa4pog/envs/mt-das-tool/db
+
+if [[ -d results/09.drep/bins ]]
+then
+        rm -fr results/09.drep/bins
+fi
+
+mkdir -p results/09.drep/bins
+
+cd results/09.drep/bins/
+
+for i in $(ls ../../08.dastool/48hrs_DASTool_bins/*.fa)
+        do name=$(basename $i .fa) 
+        cp $i $name".fasta" 
+done
+
+cp ../../07.binning_refiner/48hrs_Binning_refiner_outputs/48hrs_refined_bins/*.fasta .
+
+cd ../../..
+
+dRep dereplicate results/09.drep/ --debug -p 1 -comp 50 -con 10 -g results/09.drep/bins/*.fasta
+```
+
+Este es uno de los plots generados por dRep, que representa los mejores bins desreplicados.
+
+![dRepWinningGenomes](Figures/09.dRepWinningGenomes.png){fig-align="center"}
+
+Vamos a desactivar el ambiente de dRep
+
+``` bash
+conda deactivate
+```
+
+------------------------------------------------------------------------
+
+::: callout-important
+## Para tomar en cuenta
+
+-   En la vida real, si el proyecto de metagenómica que estás desarrollando tiene librerías de diferentes muestras usarías dRep entre todos los conjuntos de *bins* ya refinados para no tener redundancia de genomas.
+
+-   Qué harías si antes de desreplicar tienes un bin que tiene 98 % de completitud y 11 % de contaminación?. dRep en automático lo descartaría.
+
+Propondrías alguna manera para quedarte con este bin y curarlo para reducir su contaminación?
+
+Por suerte hay más programas que pueden ayudarnos a curar nuestros bins manualmente, una herramienta útil para esto es [**mmgenome2**](https://kasperskytte.github.io/mmgenome2/articles/mmgenome2.html)
+:::
+
+::: callout-tip
+## Tip
+
+Ya que tenemos los *bins* refinados y desreplicados opcionalmente podrías reensamblarlos. La manera sería mapear las lecturas de toda la muestra a los *bins* finales y con las lecturas mapeadas y el *bin,* generar un ensamble genómico para cada uno. Con esta aproximación se genera un MAG más pulido y la contaminación se reduce.
+
+Aunque en muchos reportes verás que los autores reensamblan sus MAGs, en otros no lo hacen y no hacerlo no está mal, pero hacerlo mejora la calidad.
+:::
+
+------------------------------------------------------------------------
+
+Ahora te toca a tí
+
+::: callout-warning
+## Ejercicio 2
+
+Ahora te toca a tí.
+
+-   Reúnanse en equipos y repliquen todo el flujo hasta este punto con la muestra que les toca.
+
+-   Discutan cada resultado obtenido.
+
+-   En la [carpeta compartida de Drive](https://drive.google.com/drive/folders/1iKfhMz_JdfImmsCmkPg10r-NC-nrzhQ4?usp=sharing) busquen la presentación para el Ejercicio 2, en la diapositiva correspondiente resuman sus resultados obtenidos para que los presenten.
+
+Tiempo de actividad (1.5 hr)
+
+Tiempo de presentación de resultados (5 min por equipo)
+:::
