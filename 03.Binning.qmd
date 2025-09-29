@@ -17,6 +17,8 @@ Para obtener MAGs podemos seguir el siguiente flujo de análisis:
 
 En los días anteriores aprendieron a evaluar la calidad de las lecturas, filtrarlas y ensamblarlas, por lo que este apartado comenzará con un ensamble ya generado.
 
+Para generar los ensambles recomendamos ensamblar las lecturas con metaSPAdes y con MEGAHIT, compararlos con QUAST y con BBMap y seleccionar el mejor ensamble en términos de mayor porcentaje de mapeo, es decir utilizar el mayor número de lecturas posible y obtener contigs más largos.
+
 De acuerdo con el flujo de análisis (Figura 2), debemos partir de un ensamble, mapear las lecturas y obtener un archivo de profundidad de cada contig en el ensamble.
 
 :::: callout-caution
@@ -33,10 +35,13 @@ Para generar este archivo se utilizaron las siguientes lineas de código.
 ``` bash
 # Formatear el ensamble
 bowtie2-build results/02.ensambles/megahit/48hrs/48hrs.fasta results/03.profundidad/48hrs --threads 40
+
 # Mapear las lecturas contra el ensamble
 bowtie2 -x results/03.profundidad/48hrs -1 data/48hrs_sm_R1.fastq -2 data/48hrs_sm_R2.fastq -p 40 -S results/03.profundidad/48hrs.sam
+
 # Convertir de SAM a BAM y ordenar
 samtools view -Sb -O BAM -@ 40 results/03.profundidad/48hrs.sam | samtools sort -@ 40  -o results/03.profundidad/48hrs_sorted.bam
+
 # Obtener el índice
 samtools index results/03.profundidad/48hrs_sorted.bam
 ```
@@ -95,22 +100,26 @@ Para correr metabat necesitamos activar el [ambiente conda](https://conda.io/pro
 Ahora que ya tenemos el ambiente activado vamos a crear nuestro script de slurm para ejecutarlo.
 
 ``` bash
-nano src/04.metabat.slurm
+nano src/04.metabat_48h.slurm
 ```
 
 ``` bash
 #!/bin/bash
-#SBATHC -J Metabat2 
+#SBATCH -J Metabat2 
 #SBATCH -t 0
-#SBATCH -e outs/04.metabat.err
-#SBATCH -o outs/04.metabat.out
+#SBATCH -e outs/04.metabat48h.err
+#SBATCH -o outs/04.metabat48h.out
 #SBATCH --export=ALL
-#SBATCH -n 6
+#SBATCH -n 4
 #SBATCH -N 1
 #SBATCH -p q2
-#SBATCH --mem 24G
+#SBATCH --mem 8G
 
-metabat2 -i results/02.ensambles/48hrs.fasta -a results/03.profundidad/48hrs.mgh_depth.txt -o results/04.metabat/metabat -t 6 -m 1500
+# 01. crearemos el directorio en el que se van a guardar los resultados de este proceso.
+mkdir -p results/04.metabat/48h/
+
+# 02. Corremos metabat
+metabat2 -i results/02.ensambles/48hrs.fasta -a results/03.profundidad/48hrs.mgh_depth.txt -o results/04.metabat/48h/metabat -m 1500 -t 4
 ```
 
 Guarda tecleando `ctrl + o` `enter` y después `ctrl + x` `enter`
@@ -125,7 +134,8 @@ sbatch src/04.metabat.slurm
 1.  ¿Cuántos bins se formaron?
 
 ::: {.callout-tip collapse="true" title="Ayuda"}
-1.  `ls results/04.metabat/`
+1.  `ls`
+2.  `less`
 :::
 ::::
 
@@ -143,7 +153,7 @@ conda deactivate
 
 ### MaxBin2
 
-[MaxBin2](https://sourceforge.net/projects/maxbin/files/) agrupa los contigs de acuerdo a la información de cobertura, composición nucleotídica y genes **de marcadores de copia única**.
+[MaxBin2](https://sourceforge.net/projects/maxbin/files/) agrupa los contigs de acuerdo a la información de cobertura, composición nucleotídica, contenido de GC y genes **marcadores de copia única**.
 
 Vamos a ejecutarlo, activemos el [ambiente conda](#0) donde se encuentra maxbin.
 
@@ -162,28 +172,28 @@ Vamos a ejecutarlo, activemos el [ambiente conda](#0) donde se encuentra maxbin.
 Ahora si, vamos a crear el script y ejecutarlo.
 
 ``` bash
-nano src/05.maxbin.slurm
+nano src/05.maxbin_48h.slurm
 ```
 
 ``` bash
 #!/bin/bash
 #SBATHC -J Maxbin 
 #SBATCH -t 0
-#SBATCH -e outs/05.maxbin.err
-#SBATCH -o outs/05.maxbin.out
+#SBATCH -e outs/05.maxbin48h.err
+#SBATCH -o outs/05.maxbin48h.out
 #SBATCH --export=ALL
-#SBATCH -n 6
+#SBATCH -n 4
 #SBATCH -N 1
 #SBATCH -p q2
-#SBATCH --mem 24G
+#SBATCH --mem 8G
 
-#Crea el directorio para los resultados de MaxBin2
+# 01. Crea el directorio para los resultados de MaxBin2
 
-mkdir -p results/05.maxbin
+mkdir -p results/05.maxbin/48h
 
-# Linea para correrlo
+# 02. Correr maxbin
 
-run_MaxBin.pl -thread 6 -min_contig_length 1500 -contig results/02.ensambles/48hrs.fasta -out results/05.maxbin/48hrs_maxbin -abund results/03.profundidad/48hrs.mgh_depth.txt
+run_MaxBin.pl -thread 4 -min_contig_length 1500 -contig results/02.ensambles/48hrs.fasta -abund results/03.profundidad/48hrs.mgh_depth.txt -out results/05.maxbin/48h/maxbin
 ```
 
 Y lo ejecutamos:
@@ -199,9 +209,9 @@ sbatch src/05.maxbin.slurm
 
 2\. ¿Qué porcentaje de completitud tienen??
 
-::: {.callout-tip collapse="true" title="Solución"}
-1.  `ls results/05.maxbin/*.fasta | wc -l`
-2.  `cat results/05.maxbin/48hrs_maxbin.summary | column -t`
+::: {.callout-tip collapse="true" title="Tip"}
+1.  `ls + wc -l`
+2.  `cat archivo | column -t`
 :::
 ::::
 
@@ -236,16 +246,16 @@ Crea el script para vamb:
 #SBATCH -e outs/06.vamb.err
 #SBATCH -o outs/06.vamb.out
 #SBATCH --export=ALL
-#SBATCH -n 6
+#SBATCH -n 8
 #SBATCH -N 1
 #SBATCH -p q2
 #SBATCH --mem 32G
 
-#Crea el directorio para los resultados de vamb
+# 01. Crea el directorio para los resultados de vamb
 mkdir -p results/06.vamb
 
-# La linea para vamb
-vamb --fasta results/02.ensambles/48hrs.fasta --bamfiles results/03.profundidad/48hrs_sorted.bam --minfasta 500000 --outdir results/06.vamb/48hrs
+# 02. Correr vamb
+vamb --fasta results/02.ensambles/48hrs.fasta --bamfiles results/03.profundidad/48hrs_sorted.bam --minfasta 200000 --outdir results/06.vamb/48h -p 8 -m 1500
 ```
 
 ::: callout-important
@@ -282,7 +292,7 @@ Para hacer esta evaluación, CheckM utiliza una serie de herramientas: `tree` or
 
 ![CheckM Workflow](Figures/CheckM_workflow.png){fig-align="center" width="444"}
 
-En este taller no vamos a correr CheckM para los resultados de cada *binneador* porque uno de los programas de refinamiento que usaremos ya lo corren de forma interna, sin embargo, es útil correrlo para tener una idea clara sobre la calidad de los bins que vamos obteniendo.
+En este taller no vamos a correr CheckM para los resultados de cada *binneador* porque uno de los programas de refinamiento que usaremos ya lo corren de forma interna, sin embargo, es útil correrlo y recomendamos hacerlo en la vida real para tener una idea clara sobre la calidad de los bins que vamos obteniendo.
 
 Vamos a correrlo sólo como ejemplo para los resultados de Vamb para que podamos conocerlo.
 
@@ -293,29 +303,29 @@ conda activate checkm
 ```
 
 ``` bash
+nano src/06.1.checkm_48h.slurm
+```
+
+``` bash
 #!/bin/bash
 #SBATHC -J checkm 
 #SBATCH -t 0
-#SBATCH -e outs/06b.checkm.err
-#SBATCH -o outs/06b.checkm.out
+#SBATCH -e outs/06.1.checkm.err
+#SBATCH -o outs/06.1.checkm.out
 #SBATCH --export=ALL
 #SBATCH -n 6
 #SBATCH -N 1
 #SBATCH -p q2
-#SBATCH --mem 32G
+#SBATCH --mem 64G
 
-#Crea el directorio para los resultados de vamb
-mkdir -p results/06.vamb
-
-# La linea para vamb
-vamb --fasta results/02.ensambles/48hrs.fasta --bamfiles results/03.profundidad/48hrs_sorted.bam --minfasta 500000 --outdir results/06.vamb/48hrs
 
 # Ejemplo de como correrlo con los bins de vamb
-# llamamos a las bases de datos
+
+# 01. Indicamos la ubicación de la base de datos
 export CHECKM_DATA_PATH=/lustre/databases/metagenomica/checkM/
 
-# ejecutamos checkm
-checkm lineage_wf results/06.vamb/48hrs/bins/ results/06.vamb/48hrs/checkm -x fna -t 4 -f results/06.vamb/48hrs/checkm_vamb.txt
+# 02. Ejecutamos checkm
+checkm lineage_wf results/06.vamb/48h/bins/ results/06.vamb/48h/checkm -x fna -t 6 -f results/06.vamb/48h/checkm_vamb.tsv
 ```
 
 Y ahora si, a refinar los *bins* ... 🥳
@@ -331,38 +341,55 @@ Y ahora si, a refinar los *bins* ... 🥳
 Necesitamos crear el directorio de resultados para binning_refiner y un directorio con los bins generados por cada programa
 
 ``` bash
-mkdir -p results/07.binning_refiner/48hrsbins/{metabat,maxbin,vamb}
+mkdir -p results/07.binning_refiner/48hbins/{metabat,maxbin,vamb}
 ```
 
-Ahora vamos a crear ligas simbólicas de los *bins* generados por cada herramienta.
+**Ejercicio**. Crea ligas simbólicas de los *bins* generados por cada herramienta en el directorio que corresponde.
 
-``` bash
+:::: callout-tip
+## Ejercicio: Prepara los datos
+
+Crea ligas simbólicas de los *bins* generados por cada herramienta en el directorio que corresponde de acuerdo a los directorios que acabamos de crear.
+
+::: {.callout-note collapse="true"}
+Solucion
+
 #metabat
-cd results/07.binning_refiner/48hrsbins/metabat/
 
-ln -s ../../../04.metabat/*.fa .
+`cd results/07.binning_refiner/48hbins/metabat/`
+
+`ln -s ../../../04.metabat/48h/*.fa .`
 
 #maxbin
-cd ../maxbin/
-ln -s ../../../05.maxbin/*.fasta .
 
-# vamb
-cd ../vamb/
-ln -s ../../../06.vamb/48hrs/bins/*.fna .
+`cd ../maxbin/`
 
+`ln -s ../../../05.maxbin/48h/*.fasta .`
 
-#regresar
-cd ../../
+#vamb
+
+`cd ../vamb/`
+
+`ln -s ../../../06.vamb/48h/bins/*.fna .`
+:::
+::::
+
+Regresa al directorio de resultados de Binning_refiner para ejecutar el programa dentro de ese directorio.
+
+``` bash
+# usa pwd y cd para ubicarte
 ```
 
-Ahora si, corramos Binning_refiner
+Activa el ambiente
 
 ``` bash
 conda activate mt-das-tool
 ```
 
+Ahora si, corramos Binning_refiner
+
 ``` bash
-Binning_refiner -i 48hrsbins/ -p 48hrs
+srun --mem 1G -n1 -p q2 Binning_refiner -i 48hbins/ -m 200 -p 48h
 ```
 
 Y regresemos a nuestro directorio principal
@@ -374,7 +401,7 @@ taller_metagenomica_pozol/
 Exploremos los resultados!
 
 ``` bash
-cat results/07.binning_refiner/48hrs_Binning_refiner_outputs/48hrs_sources_and_length.txt
+cat results/07.binning_refiner/48h_Binning_refiner_outputs/48h_sources_and_length.txt
 ```
 
 Copia y pega este contenido en la consola de Rscript
@@ -419,6 +446,8 @@ saveWidget(sankey_plot, file = "48hrs_sankey_plot.html")
 
 ![Binning_refiner sankey plot](Figures/07.sankey.png){fig-align="center"}
 
+---
+
 ### DASTool
 
 [DASTool](https://github.com/cmks/DAS_Tool) es una herramienta utilizada para mejorar la calidad de los *bins*. Evalúa la integridad, combina los resultados de diferentes *bineadores* y por consenso selecciona los mejores *bins* de cada herramienta. Una vez que DASTool ha seleccionado los mejores bins, realiza un proceso de refinamiento para optimizar los resultados.
@@ -428,38 +457,38 @@ saveWidget(sankey_plot, file = "48hrs_sankey_plot.html")
 Vamos a correr DASTool ... 🥳
 
 ``` bash
-nano src/08.dastool.slurm
+nano src/08.dastool_48h.slurm
 ```
 
 ``` bash
 #!/bin/bash
 #SBATHC -J dastool
 #SBATCH -t 0
-#SBATCH -e outs/08.dastool.err
-#SBATCH -o outs/08.dastool.out
+#SBATCH -e outs/08.dastool48h.err
+#SBATCH -o outs/08.dastool48h.out
 #SBATCH --export=ALL
 #SBATCH -n 6
 #SBATCH -N 1
 #SBATCH -p q2
-#SBATCH --mem 32G
+#SBATCH --mem 16G
 
 export LC_ALL=en_US.UTF-8
 
-# Crear el directorio para los resultados
-mkdir -p results/08.dastool
+# 01. Crear el directorio para los resultados
+mkdir -p results/08.dastool/48h/
 
-# DASTool necesita como entrada un archivo tabular con información de los resultados de cada programa de binning.
-Fasta_to_Contig2Bin.sh -i results/04.metabat/ -e fa > results/08.dastool/48hrs_metabat.dastool.tsv
-Fasta_to_Contig2Bin.sh -i results/05.maxbin/ -e fasta > results/08.dastool/48hrs_maxbin.dastool.tsv
-Fasta_to_Contig2Bin.sh -i results/06.vamb/48hrs/bins/ -e fna > results/08.dastool/48hrs_vamb.dastool.tsv
+# 02. DASTool necesita como entrada un archivo tabular con información de los resultados de cada programa de binning.
+Fasta_to_Contig2Bin.sh -i results/04.metabat/48h/ -e fa > results/08.dastool/48h/48hrs_metabat.dastool.tsv
+Fasta_to_Contig2Bin.sh -i results/05.maxbin/48h/ -e fasta > results/08.dastool/48h/48hrs_maxbin.dastool.tsv
+Fasta_to_Contig2Bin.sh -i results/06.vamb/48h/bins/ -e fna > results/08.dastool/48h/48hrs_vamb.dastool.tsv
 
-# Ya que tenemos los archivos tsv podemos empezar con el refinamiento!!
-DAS_Tool -i results/08.dastool/48hrs_metabat.dastool.tsv,results/08.dastool/48hrs_maxbin.dastool.tsv,results/08.dastool/48hrs_vamb.dastool.tsv -l metabat,maxbin,vamb -c results/02.ensambles/48hrs.fasta -o results/08.dastool/48hrs -t 4 --write_bins
+# 03. Ya que tenemos los archivos tsv podemos empezar con el refinamiento!!
+DAS_Tool -i results/08.dastool/48h/48hrs_metabat.dastool.tsv,results/08.dastool/48h/48hrs_maxbin.dastool.tsv,results/08.dastool/48h/48hrs_vamb.dastool.tsv -l metabat,maxbin,vamb -c results/02.ensambles/48hrs.fasta -o results/08.dastool/48h/48h -t 6 --write_bins
 ```
 
-### 
+---
 
-## Dereplicación
+## Desreplicación
 
 ### dRep
 
@@ -472,64 +501,49 @@ Ya que tenemos los resultados de los dos refinadores ejecutaremos dRep para desr
 Primero vamos a crear el directorio de resultados para dRep.
 
 ``` bash
-mkdir -p results/09.drep/bins
+mkdir -p results/09.drep/48h/bins
 ```
 
-Y entraremos al directorio bins dentro del directorio de resultados para colocar los bins que queremos comparar. En este caso los generados por ambos refinadores.
+Copia los bins que queremos comparar dentro del directorio que acabamos de crear. En este caso los generados por ambos refinadores.
+
+Con las siguientes lineas podemos copiar los bins:
 
 ``` bash
-cd results/09.drep/bins/
-```
+DASTOOL="results/08.dastool/48h/48h_DASTool_bins"
+BR_BINS="results/07.binning_refiner/48h_Binning_refiner_outputs/48h_refined_bins"
+DREP_BINS="results/09.drep/48h/bins"
 
-Con las siguientes lineas podemos copiar los bins en este directorio:
+for i in $(ls $DASTOOL/*.fa); do
+    name=$(basename $i .fa)
+    cp $i $DREP_BINS/$name".fasta"
+done
 
-``` bash
-for i in $(ls ../../08.dastool/48hrs_DASTool_bins/*.fa) ; do name=$(basename $i .fa); cp $i $name".fasta" ; done
-
-cp ../../07.binning_refiner/48hrs_Binning_refiner_outputs/48hrs_refined_bins/*.fasta .
-```
-
-Ya que los copiamos, regresemos al directorio principal.
-
-``` bash
-cd && cd taller_metagenomica_pozol/
+cp $BR_BINS/*.fasta $DREP_BINS
 ```
 
 Y ahora si, vamos a correr dRep ...
 
 ``` bash
+nano src/09.drep_48h.slurm
+```
+
+``` bash
 #!/bin/bash
 #SBATHC -J drep
 #SBATCH -t 0
-#SBATCH -e outs/09.drep.err
-#SBATCH -o outs/09.drep.out
+#SBATCH -e outs/09.drep48h.err
+#SBATCH -o outs/09.drep48h.out
 #SBATCH --export=ALL
-#SBATCH -n 1
+#SBATCH -n 4
 #SBATCH -N 1
 #SBATCH -p q2
 #SBATCH --mem 160G
 
+export LC_ALL=en_US.UTF-8
 export CHECKM_DATA_PATH=/lustre/apps/spack/opt/spack/linux-centos8-ivybridge/gcc-8.3.1/miniconda3-4.7.12.1-ubp7tlghaseisza4pqufq6sbehwa4pog/envs/mt-das-tool/db
 
-if [[ -d results/09.drep/bins ]]
-then
-        rm -fr results/09.drep/bins
-fi
 
-mkdir -p results/09.drep/bins
-
-cd results/09.drep/bins/
-
-for i in $(ls ../../08.dastool/48hrs_DASTool_bins/*.fa)
-        do name=$(basename $i .fa) 
-        cp $i $name".fasta" 
-done
-
-cp ../../07.binning_refiner/48hrs_Binning_refiner_outputs/48hrs_refined_bins/*.fasta .
-
-cd ../../..
-
-dRep dereplicate results/09.drep/ --debug -p 1 -comp 50 -con 10 -g results/09.drep/bins/*.fasta
+dRep dereplicate results/09.drep/48h/ --debug -p 4 -comp 50 -con 10 -g results/09.drep/48h/bins/*.fasta
 ```
 
 Este es uno de los plots generados por dRep, que representa los mejores bins desreplicados.
@@ -577,7 +591,7 @@ Ahora te toca a tí.
 
 -   Discutan cada resultado obtenido.
 
--   En la [carpeta compartida de Drive](https://drive.google.com/drive/folders/1iKfhMz_JdfImmsCmkPg10r-NC-nrzhQ4?usp=sharing) busquen la presentación para el Ejercicio 2, en la diapositiva correspondiente resuman sus resultados obtenidos para que los presenten.
+-   En la [carpeta compartida de Drive](https://docs.google.com/presentation/d/1f4vaJ_fV_8-i-dja2wtFx55vRkgeAB5Y4s-opCvFI1k/edit?usp=sharing) busquen la presentación para el Ejercicio 2, en la diapositiva correspondiente resuman sus resultados obtenidos para que los presenten.
 
 Tiempo de actividad (1.5 hr)
 
