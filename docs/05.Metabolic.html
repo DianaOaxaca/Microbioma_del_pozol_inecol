@@ -171,9 +171,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#prokka" id="toc-prokka" class="nav-link active" data-scroll-target="#prokka">PROKKA</a></li>
-  <li><a href="#kofamscan" id="toc-kofamscan" class="nav-link" data-scroll-target="#kofamscan">KofamScan</a></li>
+  <li><a href="#kofamscan" id="toc-kofamscan" class="nav-link" data-scroll-target="#kofamscan">KofamScan</a>
+  <ul class="collapse">
   <li><a href="#rbims" id="toc-rbims" class="nav-link" data-scroll-target="#rbims">RbiMs</a></li>
   <li><a href="#antismash" id="toc-antismash" class="nav-link" data-scroll-target="#antismash">Antismash</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -200,8 +202,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <p>Ahora que ya tenemos los <em>bins</em> refinados, queremos saber qué capacidades metabólicas poseen. Para ello es necesario predecir sus genes y asignarles función.</p>
-<section id="prokka" class="level3">
-<h3 class="anchored" data-anchor-id="prokka">PROKKA</h3>
+<section id="prokka" class="level2">
+<h2 class="anchored" data-anchor-id="prokka">PROKKA</h2>
 <p><a href="https://training.galaxyproject.org/training-material/topics/genome-annotation/tutorials/annotation-with-prokka/slides-plain.html">Prokka</a> es una herramienta útil, usa diferentes programas para predecir genes, secuencias codificantes, tRNAs, rRNAs. Hace la traducción de CDS a aminoácidos y asigna funciones usando varias bases de datos.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -278,8 +280,8 @@ Explora
 <div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> deactivate</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Ahora que tenemos las proteínas predichas vamos a obtener más anotaciones útiles, usaremos kofam para esto.</p>
 </section>
-<section id="kofamscan" class="level3">
-<h3 class="anchored" data-anchor-id="kofamscan">KofamScan</h3>
+<section id="kofamscan" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="kofamscan">KofamScan</h2>
 <p><a href="https://github.com/takaram/kofam_scan">KofamScan</a> es una herramienta de anotación, usa la base de datos KOfam de KEGG para obtener información sobre los genes que participan en diferentes rutas metabólicas.</p>
 <p>Creamos el script para kofam</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nano</span> src/12.kofam_48h.slurm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -318,10 +320,9 @@ Explora
 <span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> <span class="at">-r</span> results/12.kofam/48h/tmp<span class="pp">*</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Estos resultados ya los tienes en el directorio <code>results/12.kofam/48h</code></p>
 <p>Y ahora que ya tenemos los identificadores de KO para cada proteína, vamos a filtrar y graficar el metabolismo de los <em>bins</em>.</p>
-</section>
 <section id="rbims" class="level3 page-columns page-full">
 <h3 class="anchored" data-anchor-id="rbims">RbiMs</h3>
-<p><a href="https://github.com/mirnavazquez/RbiMs">RbiMs</a> es un paquete de R muy útil para obtener la anotación de cada KEGG ID y generar plots de esta información. Puede trabajar con anotaciones de KOFAM, Interpro o PFAM.</p>
+<p><a href="https://github.com/mirnavazquez/RbiMs">RbiMs</a> es un paquete de R muy útil para obtener la anotación de cada KEGG ID y generar plots de esta información. Puede trabajar con anotaciones de KOFAM, InterProScan, MEROPS.</p>
 <div class="quarto-figure quarto-figure-center page-columns page-full">
 <figure class="figure page-columns page-full">
 <p><img src="Figures/rRbiMs-3.png" class="img-fluid figure-img"></p>
@@ -425,6 +426,7 @@ Explora
 <p>Adicionalmente podrías anotar el metabolismo secundario de los <em>bins</em> siguiendo el flujo de análisis propuestos en la lección de <a href="https://carpentries-incubator.github.io/genome-mining/02-antismash/index.html">Minería Genómica</a> de Software Carpentry.</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

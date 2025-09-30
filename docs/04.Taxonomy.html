@@ -233,7 +233,20 @@ Activa el ambiente de gtdbtk
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cp</span> <span class="st">"</span><span class="va">$file</span><span class="st">"</span> <span class="st">"</span><span class="va">$destination_dir</span><span class="st">/</span><span class="va">$new_name</span><span class="st">"</span></span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="va">count</span><span class="op">=</span><span class="va">$((count</span> <span class="op">+</span> <span class="dv">1</span><span class="va">))</span></span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Ahora si, vamos a correr gtdbtk</p>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Resultado de GTDB-Tk
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Si gtdbtk toma aprox 1 h 15 min por lo que el resultado final se encuentra en el directorio y archivo: <code>results/10.gtdbtk/48h/gtdbtk.bac120.summary.tsv</code> que se copió desde el inicio.</p>
+<p>El siguiente script de slurm es sólo el ejemplo de como se corrió y te será útil para tu ejercicio más adelante o para tus propio datos</p>
+</div>
+</div>
 <div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nano</span> src/10.gtdbtk_48h.slurm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#SBATHC -J gtdbtk</span></span>
@@ -257,19 +270,6 @@ Activa el ambiente de gtdbtk
 <span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="co"># ahora si corremos gtdbtk</span></span>
 <span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="ex">gtdbtk</span> classify_wf <span class="at">--genome_dir</span> <span class="va">$input</span> <span class="at">--out_dir</span> <span class="va">$out</span> <span class="at">--cpus</span> 6 <span class="at">-x</span> fasta <span class="at">--mash_db</span> <span class="va">$db</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="callout callout-style-default callout-caution callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Resultado de GTDB-Tk
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Si gtdbtk está tomando mucho tiempo puedes parar el proceso con <code>ctrl + C</code> en tu teclado. El resultado final se encuentra en el directorio y archivo: <code>results/10.gtdbtk/gtdbtk.bac120.summary.tsv</code> que se copió desde el inicio.</p>
-</div>
-</div>
 <p>Después de ejecutar GTDB-tk, continuaremos en R para visualizar los datos.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
