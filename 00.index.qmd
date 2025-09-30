@@ -4,38 +4,36 @@ title: "Microbioma_del_pozol"
 
 **Taller de Análisis de Metagenomas, Reconstrucción de Genomas y Análisis de Amplicones.**
 
-En este taller introductorio aprenderemos a organizar un proyecto, analizar y visualizar datos metagenómicos; reconstruir genomas a partir de metagenomas (**MAGs**), a clasificar los MAGs taxonómicamente y a predecir sus genes e inferir su metabolismo.
+En este taller introductorio aprenderemos a organizar un proyecto, analizar y visualizar datos metagenómicos: reconstruir genomas a partir de metagenomas (**MAGs**), clasificar los MAGs taxonómicamente y a predecir sus genes e inferir su metabolismo.
 
 ------------------------------------------------------------------------
 
 ## Temario
 
-**Jueves**
+**Martes**
 
-| Hora          | Tema                                |
-|---------------|-------------------------------------|
-| 10:00 - 10:30 | Introducción a la metagenómica      |
-| 10:30 - 11:00 | Espacio de trabajo, recapitulación. |
-| 11:00 - 11:30 | Ejercicio 1                         |
-| 11:30 - 12:30 | Reconstrucción de genomas           |
-| 12:30 - 12:45 | Descanso                            |
-| 12:45 - 13:30 | Refinamiento                        |
-| 13:30 - 14:00 | Desreplicación                      |
-| 14:00 - 15:00 | Comida                              |
-| 15:00 - 17:00 | Ejercicio 2                         |
-| 17:00 - 18:00 | Discusión de resultados             |
+| Hora          | Tema                                             |
+|---------------|--------------------------------------------------|
+| 10:00 - 10:30 | Introducción a la metagenómica                   |
+| 10:30 - 11:00 | Espacio de trabajo, recapitulación y Ejercicio 1 |
+| 11:00 - 12:00 | Reconstrucción de genomas                        |
+| 12:00 - 12:10 | Descanso                                         |
+| 12:10 - 13:00 | Refinamiento                                     |
+| 13:00 - 13:30 | Desreplicación                                   |
+| 13:30 - 14:30 | Comida                                           |
+| 14:30 - 14:40 | Explorar la salida de dRep                       |
+| 14:40 - 17:00 | Ejercicio 2                                      |
+| 17:00 - 18:00 | Discusión de resultados                          |
 
-**Viernes**
+**Miércoles**
 
 | Hora          | Tema                                                    |
 |---------------|---------------------------------------------------------|
-| 10:00 - 11:00 | Asignación taxonómica                                   |
-| 11:00 - 12:00 | Predicción génica                                       |
-| 12:00 - 12:30 | Anotación                                               |
-| 12:30 - 12:45 | Descanso                                                |
-| 12:45- 13:30  | Plática sobre el microbioma del chinicuil               |
-| 13:30 - 14:00 | Revisión de resultados                                  |
-| 14:00 - 15:00 | Comida                                                  |
-| 15:00 - 16:00 | Rbims                                                   |
-| 16:00 - 17:00 | Otras inferencias metabólicas y discusión de resultados |
-|               |                                                         |
+| 10:00 - 10:30 | Asignación taxonómica                                   |
+| 10:30 - 10:45 | Predicción génica                                       |
+| 10:45 - 12:30 | Anotación                                               |
+| 12:30 - 13:30 | Ejercicio en equipos                                    |
+| 13:30 - 13:50 | Plática sobre el microbioma del chinicuil               |
+| 13:50 - 15:00 | Comida                                                  |
+| 15:00 - 16:00 | Ejercicio en equipos                                    |
+| 16:00 - 18:00 | Otras inferencias metabólicas y discusión de resultados |

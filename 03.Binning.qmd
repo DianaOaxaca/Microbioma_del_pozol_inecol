@@ -352,8 +352,6 @@ mkdir -p results/07.binning_refiner/48hbins/{metabat,maxbin,vamb}
 Crea ligas simbólicas de los *bins* generados por cada herramienta en el directorio que corresponde de acuerdo a los directorios que acabamos de crear.
 
 ::: {.callout-note collapse="true"}
-Solucion
-
 #metabat
 
 `cd results/07.binning_refiner/48hbins/metabat/`
@@ -534,7 +532,7 @@ nano src/09.drep_48h.slurm
 #SBATCH -e outs/09.drep48h.err
 #SBATCH -o outs/09.drep48h.out
 #SBATCH --export=ALL
-#SBATCH -n 4
+#SBATCH -n 10
 #SBATCH -N 1
 #SBATCH -p q2
 #SBATCH --mem 160G
@@ -543,7 +541,7 @@ export LC_ALL=en_US.UTF-8
 export CHECKM_DATA_PATH=/lustre/apps/spack/opt/spack/linux-centos8-ivybridge/gcc-8.3.1/miniconda3-4.7.12.1-ubp7tlghaseisza4pqufq6sbehwa4pog/envs/mt-das-tool/db
 
 
-dRep dereplicate results/09.drep/48h/ --debug -p 4 -comp 50 -con 10 -g results/09.drep/48h/bins/*.fasta
+dRep dereplicate results/09.drep/48h/ --debug -p 10 -comp 50 -con 10 -g results/09.drep/48h/bins/*.fasta
 ```
 
 Este es uno de los plots generados por dRep, que representa los mejores bins desreplicados.

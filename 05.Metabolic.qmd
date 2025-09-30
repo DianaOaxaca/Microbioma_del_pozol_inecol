@@ -4,7 +4,7 @@ title: "Metabolismo"
 
 Ahora que ya tenemos los *bins* refinados, queremos saber qué capacidades metabólicas poseen. Para ello es necesario predecir sus genes y asignarles función.
 
-### PROKKA
+## PROKKA
 
 [Prokka](https://training.galaxyproject.org/training-material/topics/genome-annotation/tutorials/annotation-with-prokka/slides-plain.html) es una herramienta útil, usa diferentes programas para predecir genes, secuencias codificantes, tRNAs, rRNAs. Hace la traducción de CDS a aminoácidos y asigna funciones usando varias bases de datos.
 
@@ -23,24 +23,48 @@ conda activate mt-prokka
 Tenemos el ambiente activo, ahora vamos a crear un directorio de resultados para prokka.
 
 ``` bash
-mkdir -p results/11.prokka
+mkdir -p results/11.prokka/48h
 ```
 
 Para correrlo, podemos hacer un ciclo que nos permita anotar todos los *bins.*
 
+::: callout-caution
+## No lo corras
+
+Este ciclo sólo es un ejemplo de cómo correrlo para todos los bins que tengas y lo podrás usar más adelante en un ejercicio o en los bins o genomas que estés estudiando.
+
+Repito ... No lo corras!!!
+:::
+
 ``` bash
-for FASTA in $(ls results/10.gtdbtk/bins/); do LOCUSTAG=$(basename $FASTA .fasta); prokka --locustag "${LOCUSTAG}_Scaffold"  --prefix $LOCUSTAG --addgenes --addmrn --cpus 4 --outdir "results/11.prokka/$LOCUSTAG" "results/10.gtdbtk/bins/$FASTA" ;
+#!/bin/bash
+#SBATHC -J prokka
+#SBATCH -t 0
+#SBATCH -n 6
+#SBATCH -N 1
+#SBATCH -e outs/11.prokka48.err
+#SBATCH -o outs/11.prokka48.out
+#SBATCH --export=ALL
+#SBATCH -p q2
+
+# 01. Definimos variables de ubicacion de directorios de entrada y de salida
+input="results/10.gtdbtk/48h/bins"
+out="results/11.prokka/48h"
+
+# 02. Ejecutamos prokka en todos los fasta
+for FASTA in $(ls $input/); do
+  LOCUSTAG=$(basename $FASTA .fasta)
+  prokka --locustag "${LOCUSTAG}_Scaffold" \
+  --prefix $LOCUSTAG --addgenes --addmrn \
+  --cpus 6 --outdir "${out}/${LOCUSTAG}" \
+  "${input}/${FASTA}" ;
 done
 ```
 
-::: callout-warning
+::: callout-tip
 ## Explora
 
-Mientras prokka se ejecuta en los bins que obtuviste, despliega la ayuda y discute:
-
--   ¿ qué argumentos quitarías o agregarías?
-
--   Cuáles te llamaron la atención?
+Para tener una idea de lo que ocurre cuando ejecutas prokka, toma el ejemplo anterior y anota uno de los bins obtenidos, el que más te guste. Corre prokka con una linea interactiva.
 :::
 
 Desactivemos el ambiente:
@@ -51,59 +75,59 @@ conda deactivate
 
 Ahora que tenemos las proteínas predichas vamos a obtener más anotaciones útiles, usaremos kofam para esto.
 
-### KofamScan
+## KofamScan
 
 [KofamScan](https://github.com/takaram/kofam_scan) es una herramienta de anotación, usa la base de datos KOfam de KEGG para obtener información sobre los genes que participan en diferentes rutas metabólicas.
 
 Creamos el script para kofam
 
 ``` bash
-nano src/12.kofam.slurm
+nano src/12.kofam_48h.slurm
 ```
 
 ``` bash
 #!/bin/bash
 #SBATHC -J kofam
 #SBATCH -t 0
-#SBATCH -n 4
-#SBATCH -e outs/12.kofam.err
-#SBATCH -o outs/12.kofam.out
+#SBATCH -n 6
+#SBATCH -N 1
+#SBATCH -e outs/12.kofam48h.err
+#SBATCH -o outs/12.kofam48h.out
 #SBATCH --export=ALL
 #SBATCH -p q2
-#SBATCH -w compute4
 
-# Limpiamos por si las moscas :P
+# 01. Limpiamos por si las moscas :P
 module purge
 
-# Caragmos el modulo para kofam
+# 02. Cargamos el modulo para kofam
 module load kofam-scan/1.3.0/gcc/8.3.1-n3v4
 
-# Creamos el directorio para alojar los resultados
-mkdir -p results/12.kofam
+# 03. Creamos el directorio para alojar los resultados
+mkdir -p results/12.kofam/48h/
 
-# Lo corremos
-for FAA in $(ls results/11.prokka/*/*.faa); do
+# 04. Lo corremos
+for FAA in $(ls results/11.prokka/48h/*/*.faa); do
     name=$(basename $FAA .faa)
     exec_annotation $FAA \
-        -o results/12.kofam/"$name.txt" \
+        -o results/12.kofam/48h/"$name.txt" \
         --report-unannotated \
-        --cpu 4 \
-        --tmp-dir results/12.kofam/"tmp$name" \
+        --cpu 6 \
+        --tmp-dir results/12.kofam/48h/"tmp$name" \
         -p /tmp/databases/KOfam/profiles/ \
         -k /tmp/databases/KOfam/ko_list
 done
 
-# remover los directorios temporales
-rm -r results/12.kofam/tmp*
+# 05. remover los directorios temporales
+rm -r results/12.kofam/48h/tmp*
 ```
 
-Estos resultados ya los tienes en el directorio `results/12.kofam` por si esta tardando mucho.
+Estos resultados ya los tienes en el directorio `results/12.kofam/48h`
 
 Y ahora que ya tenemos los identificadores de KO para cada proteína, vamos a filtrar y graficar el metabolismo de los *bins*.
 
 ### RbiMs
 
-[RbiMs](https://github.com/mirnavazquez/RbiMs) es un paquete de R muy útil para obtener la anotación de cada KEGG ID y generar plots de esta información. Puede trabajar con anotaciones de KOFAM, Interpro o PFAM.
+[RbiMs](https://github.com/mirnavazquez/RbiMs) es un paquete de R muy útil para obtener la anotación de cada KEGG ID y generar plots de esta información. Puede trabajar con anotaciones de KOFAM, InterProScan, MEROPS.
 
 ![RbiMs](Figures/rRbiMs-3.png){fig-align="center"}
 
