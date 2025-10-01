@@ -444,7 +444,7 @@ saveWidget(sankey_plot, file = "48hrs_sankey_plot.html")
 
 ![Binning_refiner sankey plot](Figures/07.sankey.png){fig-align="center"}
 
----
+------------------------------------------------------------------------
 
 ### DASTool
 
@@ -484,7 +484,7 @@ Fasta_to_Contig2Bin.sh -i results/06.vamb/48h/bins/ -e fna > results/08.dastool/
 DAS_Tool -i results/08.dastool/48h/48hrs_metabat.dastool.tsv,results/08.dastool/48h/48hrs_maxbin.dastool.tsv,results/08.dastool/48h/48hrs_vamb.dastool.tsv -l metabat,maxbin,vamb -c results/02.ensambles/48hrs.fasta -o results/08.dastool/48h/48h -t 6 --write_bins
 ```
 
----
+------------------------------------------------------------------------
 
 ## Desreplicación
 

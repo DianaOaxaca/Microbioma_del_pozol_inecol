@@ -42,9 +42,9 @@ done
 ::: callout-caution
 ## Resultado de GTDB-Tk
 
-Si gtdbtk toma aprox 1 h 15 min por lo que el resultado final se encuentra en el directorio y archivo: `results/10.gtdbtk/48h/gtdbtk.bac120.summary.tsv` que se copió desde el inicio.
+gtdbtk toma aprox 1 h 15 min por lo que el resultado final se encuentra en el directorio y archivo: `results/10.gtdbtk/48h/gtdbtk.bac120.summary.tsv` que se copió desde el inicio.
 
-El siguiente script de slurm es sólo el ejemplo de como se corrió y te será útil para tu ejercicio más adelante o para tus propio datos
+El siguiente script de slurm es sólo el ejemplo de como se corrió y te será útil para tu ejercicio más adelante o para tus propios datos
 :::
 
 ``` bash
@@ -62,7 +62,7 @@ nano src/10.gtdbtk_48h.slurm
 #SBATCH --export=ALL
 #SBATCH -p q2
 
-#cuando le pongo limeite de memoria me marca slurmstepd: error: Exceeded job memory limit 
+#cuando le pongo limite de memoria me marca slurmstepd: error: Exceeded job memory limit 
 export LC_ALL=en_US.UTF-8
 
 # 01. Definimos el directorio de entrada y salida
@@ -76,45 +76,28 @@ db="$out/classify/ani_screen/intermediate_results/mash/"
 gtdbtk classify_wf --genome_dir $input --out_dir $out --cpus 6 -x fasta --mash_db $db
 ```
 
-Después de ejecutar GTDB-tk, continuaremos en R para visualizar los datos.
-
-``` r
-library(tidyverse)
-library(ggplot2)
-# Leer la tabla ------------------------------------------------------------####
-GTDBtk <- read.table("gtdbtk.bac120.summary.tsv", 
-                    sep = "\t", header = TRUE, na.strings = "", 
-                    stringsAsFactors = FALSE) %>%
-  as_tibble()
-
-# Transformar datos --------------------------------------------------------####
-
-pozol_gtdbtk <- GTDBtk %>%
-  select(user_genome, classification) %>%
-  separate(classification, c(
-    "Domain", "Phylum", "Class", "Order", "Family", "Genus", "Species"), 
-    sep = ";") %>%
-  rename(Bin_name = user_genome) %>%
-  unite(Bin_name_2, c("Bin_name", "Phylum"), remove = FALSE) %>%
-  select(Bin_name, Domain, Phylum, Class, Order, Family, Genus, Species)
-
-# Guardamos los datos en un archivo de metadatos ---------------------------####
-write.table(pozol_gtdbtk, file = "Metadatos.txt", 
-            sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
-
-# Visualización de Datos ---------------------------------------------------####
-GTDBtk_barplot <- pozol_gtdbtk %>%
-  count(Phylum, Genus) %>%
-  rename(Number_of_MAGs = n) %>%
-  ggplot(aes(x = Phylum, y = Number_of_MAGs, fill = Genus)) + 
-  geom_bar(stat = "identity", position = position_dodge()) +
-  theme_minimal()
-
-GTDBtk_barplot
-```
-
 ::: callout-important
-## Discusión
+## Explora:
 
-En equipos revisen los resultados generados por GTDB-tk y propongan un plan para mejorar la identificación taxonómica, qué harían para darle más soporte a estos resultados?
+-   Revisen la tabla de resultados de GTDB-Tk (`gtdbtk.bac120.summary.tsv`). Identifiquen el MAG con la **mayor calidad** (mayor completitud y menor contaminación). ¿Qué taxonomía tiene?
+
+-   Ahora, busquen el MAG con la **taxonomía más interesante o inesperada**. ¿Hay algún género o familia que no esperarían encontrar en el pozol?
 :::
+
+:::: callout-important
+## Ejercicio:
+
+Crea una tabla que se llame `Metadatos.tsv` dentro del directorio de resultados de GTDB-tk que incluya el nombre del bin y la clasificación taxonómica.
+
+1\) Cambia el encabezado del nombre del bin: `user_genome` por `Bin_name`
+
+2\) Elimina `classification` y asegurate de que los niveles taxonómicos estén separados por tabulador. A cada columna de los niveles taxonómicos agregale su encabezado correspondiente: `Domain, Phylum, Class, Order, Family, Genus, Species`
+
+::: {.callout-tip collapse="True"}
+## Solución
+
+echo -e Bin_name"\\t"Domain"\\t"Phylum"\\t"Class"\\t"Order"\\t"Family"\\t"Genus"\\t"Species \> Metadatos.tsv
+
+cut -f1,2 gtdbtk.bac120.summary.tsv \| grep -v "classification" \| sed 's/;/\\t/g' \>\> Metadatos.tsv 
+:::
+::::

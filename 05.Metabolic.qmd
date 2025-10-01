@@ -33,7 +33,7 @@ Para correrlo, podemos hacer un ciclo que nos permita anotar todos los *bins.*
 
 Este ciclo sólo es un ejemplo de cómo correrlo para todos los bins que tengas y lo podrás usar más adelante en un ejercicio o en los bins o genomas que estés estudiando.
 
-Repito ... No lo corras!!!
+Recuerda ... No lo corras!!!
 :::
 
 ``` bash
@@ -64,7 +64,7 @@ done
 ::: callout-tip
 ## Explora
 
-Para tener una idea de lo que ocurre cuando ejecutas prokka, toma el ejemplo anterior y anota uno de los bins obtenidos, el que más te guste. Corre prokka con una linea interactiva.
+Para tener una idea de lo que ocurre cuando ejecutas prokka, toma el ejemplo anterior y anota uno de los bins obtenidos en la muestra que le tocó a tu equipo, el que más te guste, procuren elegir bins distintos. Corre prokka con una linea interactiva.
 :::
 
 Desactivemos el ambiente:
@@ -73,11 +73,54 @@ Desactivemos el ambiente:
 conda deactivate
 ```
 
-Ahora que tenemos las proteínas predichas vamos a obtener más anotaciones útiles, usaremos kofam para esto.
+Ahora que tenemos las proteínas predichas vamos a obtener más anotaciones útiles.
+
+------------------------------------------------------------------------
+
+## antiSMASH
+
+Dentro de los genomas microbianos, podemos encontrar algunas regiones específicas que participan en la biosíntesis de metabolitos secundarios, estas secciones se conocen como Clústeres de Genes Biosintéticos, que son relevantes debido a las posibles aplicaciones que pueden tener, por ejemplo: actividades antimicrobianas, antitumorales, reductoras del colesterol, antivirales, etc.
+
+[antiSMASH](https://antismash.secondarymetabolites.org/#!/start) usa modelos ocultos de Markov que permiten identificar los grupos de genes contenidos en las secuencias genómicas que codifican metabolitos secundarios de todas las clases químicas conocidas.
+
+Si te interesa buscar BGCs en los genomas de tu interés puedes aprender siguiendo el flujo de análisis propuestos en la lección de [Minería Genómica](#0) de Software Carpentry.
+
+------------------------------------------------------------------------
+
+## CAZy
+
+[Cazy](https://www.cazy.org/) es una base de datos especializada en enzimas que actúan sobre carbohidratos, esta base de datos se actualiza constantemente y es curada por una comunidad científica que busca dominios funcionales basados en evidencia experimental. Cuentan con [CAZypedia](https://www.cazypedia.org/index.php/Main_Page) para informar especificidades de cada familia cazy.
+
+En el cluster para ejecutar esta búsqueda se encuentra instalado un ambiente de conda que se llama `run_dbcan4`
+
+::: callout-important
+## Ejercicio
+
+Crea un script que corra dbcan en el archivo de proteinas que creaste con prokka. Ojo, la ruta y nombre del archivo pues en este ejemplo se corre con las proteinas del bin 48hbin04
+:::
+
+``` bash
+#!/bin/bash
+#SBATHC -J gtdbtk
+#SBATCH -t 0
+#SBATCH -n 6
+#SBATCH -N 1
+#SBATCH -e outs/13.cazy48.err
+#SBATCH -o outs/13.cazy48.out
+#SBATCH --export=ALL
+#SBATCH -p q2
+#SBATCH --mem 8G
+
+db="/lustre/apps/spack/opt/spack/linux-centos8-ivybridge/gcc-8.3.1/miniconda3-4.7.12.1-ubp7tlghaseisza4pqufq6sbehwa4pog/envs/run_dbcan4/database/db/"
+
+run_dbcan results/11.prokka/48h/48hBin04/48hBin04.faa protein --dia_cpu 6 --hmm_cpu 6 --tf_cpu 6 --stp_cpu 6 --out_pre 48hbin04 --out_dir results/13.cazy/ --db_dir $db --tools all
+```
+
+------------------------------------------------------------------------
 
 ## KofamScan
 
-[KofamScan](https://github.com/takaram/kofam_scan) es una herramienta de anotación, usa la base de datos KOfam de KEGG para obtener información sobre los genes que participan en diferentes rutas metabólicas.
+[KofamScan](https://github.com/takaram/kofam_scan) es una herramienta de anotación, usa la base de datos KOfam de [KEGG](https://www.genome.jp/kegg/pathway.html) para obtener información sobre los genes que participan en diferentes rutas metabólicas.
 
 Creamos el script para kofam
 
@@ -95,6 +138,7 @@ nano src/12.kofam_48h.slurm
 #SBATCH -o outs/12.kofam48h.out
 #SBATCH --export=ALL
 #SBATCH -p q2
+#SBATCH --mem 32G
 
 # 01. Limpiamos por si las moscas :P
 module purge
@@ -134,15 +178,11 @@ Y ahora que ya tenemos los identificadores de KO para cada proteína, vamos a fi
 Vamos al editor de Rstudio para correr RbiMs ✨
 
 ``` r
-library(tidyverse)
-library(tidyr)
-library(rbims)
-library(readxl)
-
-#setwd("/home/alumnoX/taller_metagenomica_pozol/")
+#Ubicate en el directorio donde se encuentran los txt de kofam
+setwd("/home/alumnoX/")
 
 #A continuación, leemos los resultados de KEGG 
-pozol_table <- read_ko(data_kofam = "results/12.kofam/") 
+pozol_table <- read_ko(data_kofam = "12.kofam/48h") 
 
 #y los mapeamos con la base de datos de KEGG:
 pozol_mapp <- mapping_ko(pozol_table)
@@ -222,7 +262,3 @@ pozol_mapp %>%
 ```
 
 ![](Figures/RBiMs_heatmap.png){fig-align="center" width="962"}
-
-### Antismash
-
-Adicionalmente podrías anotar el metabolismo secundario de los *bins* siguiendo el flujo de análisis propuestos en la lección de [Minería Genómica](https://carpentries-incubator.github.io/genome-mining/02-antismash/index.html) de Software Carpentry.
